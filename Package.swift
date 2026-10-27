@@ -7,19 +7,31 @@ let package = Package(
 	platforms: [
 		.macOS(.v15),
 	],
-    products: [
-        .library(
-            name: "BuildSettingsKit",
-            targets: ["BuildSettingsKit"]
-        ),
-    ],
-    targets: [
-        .target(name: "BuildSettingsKit"),
-        .testTarget(
-            name: "BuildSettingsKitTests",
-            dependencies: ["BuildSettingsKit"],
-        ),
-    ]
+	products: [
+		.executable(
+			name: "gensettings",
+			targets: ["BuildSettingsKit"]
+		),
+	],
+	dependencies: [
+		.package(url: "https://github.com/apple/swift-argument-parser", .upToNextMinor(from: "1.8.2")),
+	],
+	targets: [
+		.target(name: "_BuildSettingsCore"),
+		.executableTarget(
+			name: "BuildSettingsKit",
+			dependencies: [
+				.target(name: "_BuildSettingsCore"),
+				.product(name: "ArgumentParser", package: "swift-argument-parser"),
+			],
+		),
+		.testTarget(
+			name: "BuildSettingsKitTests",
+			dependencies: [
+				.target(name: "BuildSettingsKit"),
+			],
+		),
+	]
 )
 
 for target in package.targets where target.type != .plugin {
