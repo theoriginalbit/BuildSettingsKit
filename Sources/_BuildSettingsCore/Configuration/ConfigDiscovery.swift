@@ -2,7 +2,8 @@
 // Copyright © 2026 BuildSettingsKit. All rights reserved.
 //
 
-import Foundation
+import struct Foundation.URL
+import class Foundation.FileManager
 
 package enum ConfigDiscoveryResult {
 	case found(URL)

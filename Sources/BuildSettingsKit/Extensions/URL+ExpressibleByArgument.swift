@@ -3,7 +3,7 @@
 //
 
 import ArgumentParser
-import Foundation
+import struct Foundation.URL
 
 extension URL: @retroactive ExpressibleByArgument {
 	/// Initializes a `URL` instance using the path provided as an argument string.
