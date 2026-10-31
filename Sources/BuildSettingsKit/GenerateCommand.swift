@@ -4,6 +4,7 @@
 
 import ArgumentParser
 import struct Foundation.URL
+import class Foundation.ProcessInfo
 import _BuildSettingsCore
 
 struct GenerateCommand: ParsableCommand {
@@ -32,9 +33,21 @@ struct GenerateCommand: ParsableCommand {
 	)
 	private var output: URL?
 
+	@Option(
+		name: .shortAndLong,
+		parsing: .upToNextOption,
+		help: ArgumentHelp(
+			"Environment overrides. Passed as KEY=VALUE pairs.",
+			discussion: "Merged with, and taking precedence over, the process environment.",
+			valueName: "KEY=VALUE",
+		),
+	)
+	private var env: [EnvironmentOverride]
+
 	func run() throws {
 		let configURL = try ConfigDiscovery.resolvedConfigURL(config)
 		let config = try ConfigLoader.load(from: configURL)
+		let outputURL = resolvedOutputURL(relativeTo: configURL, using: config)
 
 		print("""
 
@@ -42,9 +55,16 @@ struct GenerateCommand: ParsableCommand {
 
 		- User supplied config: \(self.config?.path() ?? "<nil>")
 		- Resolved config:      \(configURL.path())
+		- Env overrides:        \(env.map(String.init(describing:)).joined(separator: ", "))
+		- Resolved env:
+		\(
+			resolvedEnvironment().sorted { $0.key < $1.key }
+				.map { "\t\($0.key)=\($0.value)" }
+				.joined(separator: "\n")
+		)
 		- Config:
 		\(String(describing: config))
-		- Output file:          \(resolvedOutputURL(relativeTo: configURL, using: config).path())
+		- Output file:          \(outputURL.path())
 		""")
 	}
 
@@ -53,8 +73,6 @@ struct GenerateCommand: ParsableCommand {
 	/// When the config was auto-discovered and no `--output` was given, the
 	/// generated file is placed alongside the config, using `outputFileName`
 	/// from the YAML if present, or `"BuildSettings.swift"` as the default.
-	/// We do a lightweight filename scan rather than a full YAML parse so
-	/// that we don't duplicate the parse-then-generate pipeline.
 	private func resolvedOutputURL(relativeTo configURL: URL, using config: Configuration) -> URL {
 		if let output {
 			return output
@@ -63,5 +81,13 @@ struct GenerateCommand: ParsableCommand {
 		return configURL
 			.deletingLastPathComponent()
 			.appending(path: outputFileName, directoryHint: .notDirectory)
+	}
+
+	private func resolvedEnvironment() -> [String: String] {
+		var environment = ProcessInfo.processInfo.environment
+		for override in env {
+			environment[override.key] = override.value
+		}
+		return environment
 	}
 }
