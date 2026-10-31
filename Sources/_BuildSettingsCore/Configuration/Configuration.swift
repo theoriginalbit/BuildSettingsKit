@@ -5,5 +5,9 @@
 /// Top-level structure of `.buildsettings.yaml`.
 package struct Configuration: Decodable {
 	/// Name of the generated Swift file. Defaults to `"BuildSettings.swift"`.
-	package let outputFileName: String?
+	@SourceLocatable
+	package var outputFileName: String?
+
+	@SourceLocatable
+	package var settings: ConfigurationSettings
 }

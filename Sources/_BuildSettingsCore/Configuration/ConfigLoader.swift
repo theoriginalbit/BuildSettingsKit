@@ -5,6 +5,7 @@
 import struct Foundation.URL
 import struct Foundation.Data
 import class Yams.YAMLDecoder
+import func Yams.compose
 
 package enum ConfigLoader {
 	package static func load(from configURL: URL) throws(GeneratorError) -> Configuration {
@@ -14,7 +15,14 @@ package enum ConfigLoader {
 			if data.isEmpty || contents.allSatisfy(\.isWhitespace) {
 				throw GeneratorError.emptyConfigFile(configURL)
 			}
-			return try YAMLDecoder().decode(Configuration.self, from: contents)
+			let root = try? compose(yaml: contents) // let YAMLDecoder throw any syntax errors
+			return try YAMLDecoder().decode(
+				Configuration.self,
+				from: contents,
+				userInfo: [
+					.yamlRoot: root as Any,
+				],
+			)
 		} catch let error as GeneratorError {
 			throw error
 		} catch let error as DecodingError {

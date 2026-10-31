@@ -1,1 +1,6 @@
 outputFileName: BuildSettings.swift
+
+settings:
+  - key: MARKETING_VERSION
+    type: String
+    comment: User-facing version string shown in the App Store and Settings.

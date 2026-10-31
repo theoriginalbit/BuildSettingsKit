@@ -15,7 +15,7 @@ package struct GeneratorError: Error, CustomStringConvertible {
 package extension GeneratorError {
 	@inlinable
 	static func missingConfigFile(path: String) -> Self {
-		GeneratorError("error: BuildSettingsKit configuration file not found at '\(path)'.")
+		GeneratorError("Configuration file '\(path)' does not exist.")
 	}
 
 	@inlinable
@@ -26,7 +26,7 @@ package extension GeneratorError {
 
 		return GeneratorError(
 			"""
-			error: BuildSettingsKit: Multiple configuration files found.
+			BuildSettingsKit: Multiple configuration files found.
 			Use --config to specify which one to use:
 			\(list)
 			"""
@@ -35,29 +35,42 @@ package extension GeneratorError {
 
 	@inlinable
 	static func noConfigFound(searchRoot: String) -> Self {
-		GeneratorError("error: No configuration file not found. Provide --config argument or add a configuration file in '\(searchRoot)'.")
+		GeneratorError("No configuration file not found. Provide --config argument or add a configuration file in '\(searchRoot)'.")
 	}
 
 	@inlinable
 	static func emptyConfigFile(_ file: URL) -> Self {
-		GeneratorError("error: BuildSettingsKit discovered empty configuration file at '\(file.path())'.")
+		GeneratorError("Configuration file cannot be empty.")
 	}
 
 	@inlinable
 	static func invalidConfigFile(_ file: URL, error: some Error) -> Self {
-		GeneratorError("error: BuildSettingsKit could not parse configuration file at '\(file.path())'. \(error.localizedDescription)")
+		GeneratorError("Failed to parse configuration file: \(error.localizedDescription).")
 	}
 
 	@inlinable
 	static func invalidConfigFile(_ file: URL, error: DecodingError) -> Self {
-		GeneratorError("error: BuildSettingsKit could not parse configuration file at '\(file.path())'. \(error.friendlyDescription)")
+		GeneratorError("Failed to parse configuration file: \(error.friendlyDescription).")
 	}
 }
 
 extension DecodingError {
+	var failingPath: [CodingKey] {
+		switch self {
+		case let .keyNotFound(key, context):
+			context.codingPath + CollectionOfOne(key)
+		case let .valueNotFound(_, context),
+			let .typeMismatch(_, context),
+			let .dataCorrupted(context):
+			context.codingPath
+		@unknown default:
+			[]
+		}
+	}
+
 	var friendlyDescription: String {
 		func path(_ context: Context) -> String {
-			context.codingPath.reduce("$") { result, nextKey in
+			return context.codingPath.reduce("root") { result, nextKey in
 				if let intValue = nextKey.intValue {
 					return "\(result)[\(intValue)]"
 				}
@@ -74,7 +87,7 @@ extension DecodingError {
 			return "Expected \(type) but found null at \(path(context))"
 
 		case let .typeMismatch(type, context):
-			return "Type mismatch at \(path(context)): expected \(type). \(context.debugDescription)"
+			return "Type mismatch at \(path(context)): expected \(type)"
 
 		case let .dataCorrupted(context):
 			return "Invalid data at \(path(context)): \(context.debugDescription)"
