@@ -44,43 +44,34 @@ struct GenerateCommand: ParsableCommand {
 	)
 	private var env: [EnvironmentOverride]
 
+	@Flag(
+		exclusivity: .exclusive,
+		help: ArgumentHelp(
+			"Show diagnostic messages with short filenames (best for CLI) or long file paths for Xcode's issue navigator to annotate (best for parsing.)"
+		),
+	)
+	private var diagnosticMode: DiagnosticMode = .cli
+
+	@Flag(name: .shortAndLong, help: "Increase verbosity (-vvv).")
+	private var verbose: Int
+
 	func run() throws {
 		let configURL = try ConfigDiscovery.resolvedConfigURL(config)
 		let config = try ConfigLoader.load(from: configURL)
-		let outputURL = resolvedOutputURL(relativeTo: configURL, using: config)
+		let env = resolvedEnvironment()
 
-		print("""
-
-		Hello from the generate command
-
-		- User supplied config: \(self.config?.path() ?? "<nil>")
-		- Resolved config:      \(configURL.path())
-		- Env overrides:        \(env.map(String.init(describing:)).joined(separator: ", "))
-		- Resolved env:
-		\(
-			resolvedEnvironment().sorted { $0.key < $1.key }
-				.map { "\t\($0.key)=\($0.value)" }
-				.joined(separator: "\n")
+		let diagnosticsCollector = StandardDiagnosticCollector(
+			diagnosticMode: diagnosticMode,
+			verbosity: verbose,
 		)
-		- Config:
-		\(String(describing: config))
-		- Output file:          \(outputURL.path())
-		""")
-	}
 
-	/// Returns the output URL, either from `--output` or derived from the config location.
-	///
-	/// When the config was auto-discovered and no `--output` was given, the
-	/// generated file is placed alongside the config, using `outputFileName`
-	/// from the YAML if present, or `"BuildSettings.swift"` as the default.
-	private func resolvedOutputURL(relativeTo configURL: URL, using config: Configuration) -> URL {
-		if let output {
-			return output
-		}
-		let outputFileName = config.outputFileName ?? "BuildSettings.swift"
-		return configURL
-			.deletingLastPathComponent()
-			.appending(path: outputFileName, directoryHint: .notDirectory)
+		let generator = CodeGenerator(
+			environment: env,
+			config: config,
+			configURL: configURL,
+			outputURL: output,
+		)
+		generator.run(diagnosticsCollector)
 	}
 
 	private func resolvedEnvironment() -> [String: String] {

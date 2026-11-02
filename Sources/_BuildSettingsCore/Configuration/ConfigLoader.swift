@@ -20,6 +20,7 @@ package enum ConfigLoader {
 				Configuration.self,
 				from: contents,
 				userInfo: [
+					.sourceFile: configURL,
 					.yamlRoot: root as Any,
 				],
 			)
