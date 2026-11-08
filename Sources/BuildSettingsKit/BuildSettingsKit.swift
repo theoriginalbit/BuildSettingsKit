@@ -9,6 +9,7 @@ struct BuildSettingsKit: ParsableCommand {
 	static let configuration = CommandConfiguration(
 		commandName: "gensettings",
 		abstract: "Generate a type-safe Swift file from Xcode build settings.",
+		version: GitVersion.current,
 		subcommands: [GenerateCommand.self],
 		defaultSubcommand: GenerateCommand.self
 	)

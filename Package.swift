@@ -30,12 +30,19 @@ let package = Package(
 				.target(name: "_BuildSettingsCore"),
 				.product(name: "ArgumentParser", package: "swift-argument-parser"),
 			],
+			plugins: [
+				.plugin(name: "GitVersionPlugin"),
+			],
 		),
 		.testTarget(
 			name: "BuildSettingsKitTests",
 			dependencies: [
 				.target(name: "BuildSettingsKit"),
 			],
+		),
+		.plugin(
+			name: "GitVersionPlugin",
+			capability: .buildTool(),
 		),
 	]
 )
