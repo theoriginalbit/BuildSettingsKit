@@ -4,10 +4,17 @@
 
 import struct Foundation.URL
 
-package struct GeneratorError: Error, CustomStringConvertible {
+package struct GeneratorError: Error, Equatable, CustomStringConvertible {
+	package enum Stage {
+		case config
+		case generation
+	}
+
+	package let stage: Stage
 	package let description: String
 
-	private init(_ description: String) {
+	private init(stage: Stage, message description: String) {
+		self.stage = stage
 		self.description = description
 	}
 }
@@ -15,7 +22,7 @@ package struct GeneratorError: Error, CustomStringConvertible {
 package extension GeneratorError {
 	@inlinable
 	static func missingConfigFile(path: String) -> Self {
-		GeneratorError("Configuration file '\(path)' does not exist.")
+		GeneratorError(stage: .config, message: "Configuration file '\(path)' does not exist.")
 	}
 
 	@inlinable
@@ -25,7 +32,8 @@ package extension GeneratorError {
 			.joined(separator: "\n")
 
 		return GeneratorError(
-			"""
+			stage: .config,
+			message: """
 			BuildSettingsKit: Multiple configuration files found.
 			Use --config to specify which one to use:
 			\(list)
@@ -35,23 +43,34 @@ package extension GeneratorError {
 
 	@inlinable
 	static func noConfigFound(searchRoot: String) -> Self {
-		GeneratorError("No configuration file not found. Provide --config argument or add a configuration file in '\(searchRoot)'.")
+		GeneratorError(
+			stage: .config,
+			message: "No configuration file not found. Provide --config argument or add a configuration file in '\(searchRoot)'."
+		)
 	}
 
 	@inlinable
 	static func emptyConfigFile(_ file: URL) -> Self {
-		GeneratorError("Configuration file cannot be empty.")
+		GeneratorError(stage: .config, message: "Configuration file cannot be empty.")
 	}
 
 	@inlinable
 	static func invalidConfigFile(_ file: URL, error: some Error) -> Self {
-		GeneratorError("Failed to parse configuration file: \(error.localizedDescription).")
+		GeneratorError(
+			stage: .config,
+			message: "Failed to parse configuration file: \(error.localizedDescription)."
+		)
 	}
 
 	@inlinable
 	static func invalidConfigFile(_ file: URL, error: DecodingError) -> Self {
-		GeneratorError("Failed to parse configuration file: \(error.friendlyDescription).")
+		GeneratorError(
+			stage: .config,
+			message: "Failed to parse configuration file: \(error.friendlyDescription)."
+		)
 	}
+
+	static let generationFailed = GeneratorError(stage: .generation, message: "Code generation failed due to previous errors.")
 }
 
 extension DecodingError {

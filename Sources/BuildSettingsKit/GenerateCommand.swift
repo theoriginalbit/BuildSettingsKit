@@ -65,13 +65,15 @@ struct GenerateCommand: ParsableCommand {
 			verbosity: verbose,
 		)
 
-		let generator = CodeGenerator(
+		let context = CodeGenerator.Context(
 			environment: env,
 			config: config,
-			configURL: configURL,
-			outputURL: output,
+			outputURL: resolvedOutputURL(relativeTo: configURL, using: config),
+			verbosity: verbose,
+			diagnostics: diagnosticsCollector,
 		)
-		generator.run(diagnosticsCollector)
+		let generator = CodeGenerator()
+		try generator.run(with: context)
 	}
 
 	private func resolvedEnvironment() -> [String: String] {
@@ -80,5 +82,18 @@ struct GenerateCommand: ParsableCommand {
 			environment[override.key] = override.value
 		}
 		return environment
+	}
+
+	/// Returns an output URL alongside the config location.
+	///
+	/// The filename will be read from the config value ``Configuration/outputFileName`` or default to `BuildSettings.swift`.
+	private func resolvedOutputURL(relativeTo configURL: URL, using config: Configuration) -> URL {
+		if let output {
+			return output
+		}
+		let outputFileName = config.outputFileName ?? "BuildSettings.swift"
+		return configURL
+			.deletingLastPathComponent()
+			.appending(path: outputFileName, directoryHint: .notDirectory)
 	}
 }

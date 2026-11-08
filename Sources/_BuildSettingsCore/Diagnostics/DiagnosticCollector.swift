@@ -41,6 +41,27 @@ package extension DiagnosticCollector {
 		}
 		return "\(prefix)\(diagnostic.severity): \(diagnostic.message)"
 	}
+
+	func notice(_ message: String, location: SourceLocation? = nil) {
+		self.emit(.notice(message, location: location))
+	}
+
+	func info(_ message: String, location: SourceLocation? = nil) {
+		self.emit(.info(message, location: location))
+	}
+
+	func warning(_ message: String, location: SourceLocation? = nil) {
+		self.emit(.warning(message, location: location))
+	}
+
+	func error(_ message: String, location: SourceLocation? = nil) {
+		self.emit(.error(message, location: location))
+	}
+
+	/// - Important: Emitting a fault will output the diagnostic and immediately exit the process
+	func fault(_ message: String, location: SourceLocation? = nil) {
+		self.emit(.fault(message, location: location))
+	}
 }
 
 package protocol DiagnosticOutputHandle: Sendable {
