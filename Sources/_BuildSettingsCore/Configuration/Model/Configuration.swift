@@ -24,11 +24,3 @@ package struct Configuration: Decodable {
 	@SourceLocatable
 	package var settings: ConfigurationSettings
 }
-
-package enum AccessModifier: String {
-	case `public`
-	case package
-	case `internal`
-	case `fileprivate`
-	case `private`
-}

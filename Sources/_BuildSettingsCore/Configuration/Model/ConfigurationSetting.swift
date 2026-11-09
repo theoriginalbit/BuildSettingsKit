@@ -7,6 +7,10 @@ package struct ConfigurationSetting: Decodable {
 	@SourceLocatable
 	package var key: String
 
+	/// Swift type of the value.
+	@SourceLocatable
+	package var type: String
+
 	/// The member name to use in the generated code for this build setting.
 	@SourceLocatable
 	package var swiftName: String?

@@ -25,16 +25,16 @@ package struct CodeGenerator {
 			location: config.$accessModifier,
 		)
 
+		guard let typeName = resolveTypeName(from: context) else {
+			// no point in generating anything if the type name is invalid
+			throw GeneratorError.generationFailed
+		}
+
 		var properties: [PropertyDescriptor] = []
 		for setting in config.settings {
 			if let property = generateSettingProperty(setting, rootAccessModifier: configAccessModifier, with: context) {
 				properties.append(property)
 			}
-		}
-
-		guard let typeName = resolveTypeName(from: context) else {
-			// no point in generating anything if the type name is invalid
-			throw GeneratorError.generationFailed
 		}
 
 		// we may not have all the settings defined, but do partial code generation
@@ -103,9 +103,10 @@ package struct CodeGenerator {
 			)
 			return nil
 		}
-		guard let identifier = resolveMemberName(for: setting, diagnostics: context.diagnostics) else {
-			return nil
-		}
+		guard let identifier = resolveMemberName(for: setting, diagnostics: context.diagnostics),
+			  let type = resolveType(for: setting, diagnostics: context.diagnostics),
+			  let expression = resolveLiteral(value, for: type, diagnostics: context.diagnostics, location: setting.$key)
+		else { return nil }
 		return .computed(
 			identifier,
 			comment: setting.comment.map(DocCommentDescriptor.init(_:)),
@@ -115,13 +116,9 @@ package struct CodeGenerator {
 				diagnostics: context.diagnostics,
 				location: setting.$accessModifier,
 			)),
-			attributes: [],
 			isStatic: true,
-			type: .string,
-			getterEffects: .none,
-			getter: {
-				.literal(.string(value))
-			})
+			type: typeReference(for: type),
+			getter: { expression })
 	}
 
 	func resolveMemberName(for setting: ConfigurationSetting, diagnostics: some DiagnosticCollector) -> String? {
@@ -158,7 +155,7 @@ package struct CodeGenerator {
 		if let accessModifier = AccessModifier(rawValue: value) {
 			return accessModifier
 		}
-		diagnostics.warning("Invalid access modifier: '\(value)'. Falling back to '\(defaultValue.rawValue)'.", location: location)
+		diagnostics.warning("Invalid access modifier: '\(value)' falling back to '\(defaultValue.rawValue)'", location: location)
 		return defaultValue
 	}
 
@@ -170,5 +167,80 @@ package struct CodeGenerator {
 		case .fileprivate: .fileprivate
 		case .private: .private
 		}
+	}
+
+	func resolveType(for setting: ConfigurationSetting, diagnostics: some DiagnosticCollector) -> SettingType? {
+		guard let type = SettingType(rawValue: setting.type) else {
+			diagnostics.error(
+				"Invalid setting type: '\(setting.type)'",
+				location: setting.$type
+			)
+			return nil
+		}
+		return type
+	}
+
+	func typeReference(for settingType: SettingType) -> TypeReference {
+		switch settingType {
+		case .string: .string
+		case .bool: .bool
+		case .int: .int
+		case .double: .double
+		case .url: .identifier("URL")
+		}
+	}
+
+	func resolveLiteral(
+		_ value: String,
+		for settingType: SettingType,
+		diagnostics: some DiagnosticCollector,
+		location: SourceLocation?,
+	) -> ExpressionDescriptor? {
+		do {
+			return switch settingType {
+			case .string: .literal(.string(value))
+			case .bool: try boolLiteral(value)
+			case .int: try intLiteral(value)
+			case .double: try doubleLiteral(value)
+			case .url: try urlLiteral(value)
+			}
+		} catch {
+			if let expected = error.expected {
+				diagnostics.error("Could not convert value '\(value)' to \(error.type) (expected \(expected))", location: location)
+			} else {
+				diagnostics.error("Could not convert value '\(value)' to \(error.type)", location: location)
+			}
+			return nil
+		}
+	}
+
+	func boolLiteral(_ rawValue: String) throws(LiteralConversionError) -> ExpressionDescriptor {
+		switch rawValue.lowercased() {
+		case "yes", "true",  "1": return .literal(.boolean(true))
+		case "no",  "false", "0": return .literal(.boolean(false))
+		default:
+			throw LiteralConversionError(type: "boolean", expected: "yes/true/1, or no/false/0")
+		}
+	}
+
+	func intLiteral(_ rawValue: String) throws(LiteralConversionError) -> ExpressionDescriptor {
+		guard let value = Int(rawValue) else {
+			throw LiteralConversionError(type: "integer", expected: nil)
+		}
+		return .literal(.integer(value))
+	}
+
+	func doubleLiteral(_ rawValue: String) throws(LiteralConversionError) -> ExpressionDescriptor {
+		guard let value = Double(rawValue) else {
+			throw LiteralConversionError(type: "double", expected: nil)
+		}
+		return .literal(.double(value))
+	}
+
+	func urlLiteral(_ rawValue: String) throws(LiteralConversionError) -> ExpressionDescriptor {
+		guard URL(string: rawValue) != nil else {
+			throw LiteralConversionError(type: "URL", expected: nil)
+		}
+		return .raw(#"URL(string: "\#(rawValue)")!"#)
 	}
 }
