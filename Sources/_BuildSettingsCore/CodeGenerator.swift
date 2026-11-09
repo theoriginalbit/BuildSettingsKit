@@ -29,6 +29,8 @@ package struct CodeGenerator {
 		// anyway, then throw afterward.
 
 		let date = Date.now.formatted(.iso8601)
+
+		let typeName = resolveTypeName(from: context)
 		let file = SwiftFile(
 			headerComment: """
 			\(outputURL.lastPathComponent)
@@ -36,7 +38,7 @@ package struct CodeGenerator {
 			DO NOT EDIT — changes will be overwritten on the next build.
 			""",
 			imports: [.init("Foundation")]) {
-				PlainEnumDescriptor("BuildSettings") { /* no cases */ } members: {
+				PlainEnumDescriptor(typeName) { /* no cases */ } members: {
 					for property in properties {
 						.property(property)
 					}
@@ -53,6 +55,14 @@ package struct CodeGenerator {
 		guard !context.diagnostics.hasErrors else {
 			throw GeneratorError.generationFailed
 		}
+	}
+
+	func resolveTypeName(from context: Context<some DiagnosticCollector>) -> String {
+		if let typeName = context.config.typeName {
+			// TODO: validate/santise config typeName, include warning diagnostic
+			return typeName
+		}
+		return "BuildSettings"
 	}
 
 	func generateSettingProperty(_ setting: ConfigurationSetting, with context: Context<some DiagnosticCollector>) -> PropertyDescriptor? {

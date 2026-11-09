@@ -8,6 +8,10 @@ package struct Configuration: Decodable {
 	@SourceLocatable
 	package var outputFileName: String?
 
+	/// Name of the enum namespace type to access the settings. Defaults to `"BuildSettings"`.
+	@SourceLocatable
+	package var typeName: String?
+
 	@SourceLocatable
 	package var settings: ConfigurationSettings
 }
