@@ -16,6 +16,10 @@ package struct Configuration: Decodable {
 	@SourceLocatable
 	package var accessModifier: String?
 
+	/// A DocC comment to attach to the member.
+	@SourceLocatable
+	package var comment: String?
+
 	/// The build settings to locate and generate members for.
 	@SourceLocatable
 	package var settings: ConfigurationSettings

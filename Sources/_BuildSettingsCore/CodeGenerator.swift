@@ -48,7 +48,11 @@ package struct CodeGenerator {
 			DO NOT EDIT — changes will be overwritten on the next build.
 			""",
 			imports: [.init("Foundation")]) {
-				PlainEnumDescriptor(typeName, accessModifier: descriptor(for: configAccessModifier)) { /* no cases */ } members: {
+				PlainEnumDescriptor(
+					typeName,
+					comment: config.comment.map(DocCommentDescriptor.init(_:)),
+					accessModifier: descriptor(for: configAccessModifier)
+				) { /* no cases */ } members: {
 					for property in properties {
 						.property(property)
 					}
@@ -104,7 +108,7 @@ package struct CodeGenerator {
 		}
 		return .computed(
 			identifier,
-			comment: nil,
+			comment: setting.comment.map(DocCommentDescriptor.init(_:)),
 			accessModifier: descriptor(for: resolveAccessModifier(
 				from: setting.accessModifier,
 				fallingBackTo: rootAccessModifier,
