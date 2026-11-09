@@ -3,16 +3,26 @@
 //
 
 import class Foundation.FileHandle
+import struct Foundation.Data
 import func Foundation.exit
 import let Foundation.EXIT_FAILURE
+import struct Synchronization.Atomic
 
 package struct StandardDiagnosticCollector<StdOut: DiagnosticOutputHandle, StdErr: DiagnosticOutputHandle>: DiagnosticCollector, Sendable {
-	package var mode: DiagnosticMode { stdOut.mode }
+	final class MutableState: Sendable {
+		let hasErrors = Atomic<Bool>(false)
+	}
 
+	let stdOut: StdOut
+	let stdErr: StdErr
+	package let mode: DiagnosticMode
 	package let verbosity: Diagnostic.Severity
 
-	let stdOut: StdOutPrintingDiagnosticCollector<StdOut>
-	let stdErr: StdErrPrintingDiagnosticCollector<StdErr>
+	private let state = MutableState()
+	package private(set) var hasErrors: Bool {
+		get { state.hasErrors.load(ordering: .relaxed) }
+		nonmutating set { state.hasErrors.store(newValue, ordering: .relaxed) }
+	}
 
 	package init(
 		stdOut: StdOut = FileHandle.standardOutput,
@@ -20,21 +30,25 @@ package struct StandardDiagnosticCollector<StdOut: DiagnosticOutputHandle, StdEr
 		diagnosticMode: DiagnosticMode,
 		verbosity: Int,
 	) {
-		self.stdOut = .init(stdOut, diagnosticMode: diagnosticMode, verbosity: verbosity)
-		self.stdErr = .init(stdErr, diagnosticMode: diagnosticMode, verbosity: verbosity)
+		self.stdOut = stdOut
+		self.stdErr = stdErr
+		self.mode = diagnosticMode
 		self.verbosity = Diagnostic.Severity(verbosity: verbosity)
 	}
 
 	package func emit(_ diagnostic: Diagnostic) {
 		guard canEmit(diagnostic) else { return }
+		let message = describe(diagnostic) + "\n"
 
 		switch diagnostic.severity {
 		case .notice, .info, .warning:
-			stdOut.emit(diagnostic)
+			stdOut.write(Data(message.utf8))
 		case .error:
-			stdErr.emit(diagnostic)
+			hasErrors = true
+			stdErr.write(Data(message.utf8))
 		case .fault:
-			stdErr.emit(diagnostic)
+			// no need to set hasErrors since we immediately exit
+			stdErr.write(Data(message.utf8))
 			exit(EXIT_FAILURE)
 		}
 	}

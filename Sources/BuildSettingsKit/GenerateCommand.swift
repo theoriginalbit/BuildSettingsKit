@@ -73,7 +73,13 @@ struct GenerateCommand: ParsableCommand {
 			diagnostics: diagnosticsCollector,
 		)
 		let generator = CodeGenerator()
-		try generator.run(with: context)
+		do {
+			try generator.run(with: context)
+		} catch let error as GeneratorError where error.stage == .generation {
+			// there was an error during generation, there will be diagnostics already
+			// so just throw failure so there isn't a double printout of the error
+			throw ExitCode.failure
+		}
 	}
 
 	private func resolvedEnvironment() -> [String: String] {

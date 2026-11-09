@@ -10,10 +10,10 @@ package enum DiagnosticMode {
 	case xcode
 }
 
-
 package protocol DiagnosticCollector {
 	var mode: DiagnosticMode { get }
 	var verbosity: Diagnostic.Severity { get }
+	var hasErrors: Bool { get }
     func emit(_ diagnostic: Diagnostic)
 	func describe(_ diagnostic: Diagnostic) -> String
 }

@@ -48,6 +48,11 @@ package struct CodeGenerator {
 			withIntermediateDirectories: true
 		)
 		try file.render(to: outputURL, indentUsing: .spaces(2))
+
+		// Abort if any diagnostic errors were prevented complete generation
+		guard !context.diagnostics.hasErrors else {
+			throw GeneratorError.generationFailed
+		}
 	}
 
 	func generateSettingProperty(_ setting: ConfigurationSetting, with context: Context<some DiagnosticCollector>) -> PropertyDescriptor? {
