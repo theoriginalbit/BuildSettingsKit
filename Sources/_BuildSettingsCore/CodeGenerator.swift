@@ -32,12 +32,15 @@ package struct CodeGenerator {
 			}
 		}
 
+		guard let typeName = resolveTypeName(from: context) else {
+			// no point in generating anything if the type name is invalid
+			throw GeneratorError.generationFailed
+		}
+
 		// we may not have all the settings defined, but do partial code generation
 		// anyway, then throw afterward.
 
 		let date = Date.now.formatted(.iso8601)
-
-		let typeName = resolveTypeName(from: context)
 		let file = SwiftFile(
 			headerComment: """
 			\(outputURL.lastPathComponent)
@@ -64,12 +67,24 @@ package struct CodeGenerator {
 		}
 	}
 
-	func resolveTypeName(from context: Context<some DiagnosticCollector>) -> String {
-		if let typeName = context.config.typeName {
-			// TODO: validate/santise config typeName, include warning diagnostic
-			return typeName
+	func resolveTypeName(from context: Context<some DiagnosticCollector>) -> String? {
+		guard let typeName = context.config.typeName else {
+			return "BuildSettings"
 		}
-		return "BuildSettings"
+		guard let identifier = Identifier(typeName) else {
+			context.diagnostics.error(
+				"Invalid Swift identifier: '\(typeName)'",
+				location: context.config.$typeName
+			)
+			return nil
+		}
+		if !identifier.followsNamingConvention(.typeName) {
+			context.diagnostics.warning(
+				"Identifier does not follow type naming convention of UpperCamelCase",
+				location: context.config.$typeName
+			)
+		}
+		return identifier.value
 	}
 
 	func generateSettingProperty(
@@ -84,9 +99,11 @@ package struct CodeGenerator {
 			)
 			return nil
 		}
-
+		guard let identifier = resolveMemberName(for: setting, diagnostics: context.diagnostics) else {
+			return nil
+		}
 		return .computed(
-			resolveMemberName(for: setting),
+			identifier,
 			comment: nil,
 			accessModifier: descriptor(for: resolveAccessModifier(
 				from: setting.accessModifier,
@@ -103,8 +120,26 @@ package struct CodeGenerator {
 			})
 	}
 
-	func resolveMemberName(for setting: ConfigurationSetting) -> String {
-		setting.swiftName ?? ""
+	func resolveMemberName(for setting: ConfigurationSetting, diagnostics: some DiagnosticCollector) -> String? {
+		guard let swiftName = setting.swiftName else {
+			// assumption: keys should be simple enough to only need
+			// passing through a simple transformation
+			return Identifier.camelCased(setting.key)
+		}
+		guard let identifier = Identifier(swiftName) else {
+			diagnostics.error(
+				"Invalid identifier: '\(swiftName)'",
+				location: setting.$swiftName
+			)
+			return nil
+		}
+		if !identifier.followsNamingConvention(.memberName) {
+			diagnostics.warning(
+				"Identifier does not follow member naming convention of lowerCamelCase",
+				location: setting.$swiftName
+			)
+		}
+		return identifier.value
 	}
 
 	func resolveAccessModifier(
