@@ -18,9 +18,16 @@ package struct CodeGenerator {
 			context.diagnostics.error("Must supply at least one setting to codegen", location: config.$settings)
 		}
 
+		let configAccessModifier = resolveAccessModifier(
+			from: config.accessModifier,
+			fallingBackTo: .internal,
+			diagnostics: context.diagnostics,
+			location: config.$accessModifier,
+		)
+
 		var properties: [PropertyDescriptor] = []
 		for setting in config.settings {
-			if let property = generateSettingProperty(setting, with: context) {
+			if let property = generateSettingProperty(setting, rootAccessModifier: configAccessModifier, with: context) {
 				properties.append(property)
 			}
 		}
@@ -38,7 +45,7 @@ package struct CodeGenerator {
 			DO NOT EDIT — changes will be overwritten on the next build.
 			""",
 			imports: [.init("Foundation")]) {
-				PlainEnumDescriptor(typeName) { /* no cases */ } members: {
+				PlainEnumDescriptor(typeName, accessModifier: descriptor(for: configAccessModifier)) { /* no cases */ } members: {
 					for property in properties {
 						.property(property)
 					}
@@ -65,7 +72,11 @@ package struct CodeGenerator {
 		return "BuildSettings"
 	}
 
-	func generateSettingProperty(_ setting: ConfigurationSetting, with context: Context<some DiagnosticCollector>) -> PropertyDescriptor? {
+	func generateSettingProperty(
+		_ setting: ConfigurationSetting,
+		rootAccessModifier: AccessModifier,
+		with context: Context<some DiagnosticCollector>
+	) -> PropertyDescriptor? {
 		guard let value = context.environment[setting.key] else {
 			context.diagnostics.error(
 				"No matching key in environment: '\(setting.key)'",
@@ -73,10 +84,16 @@ package struct CodeGenerator {
 			)
 			return nil
 		}
+
 		return .computed(
-			setting.swiftName ?? "",
+			resolveMemberName(for: setting),
 			comment: nil,
-			accessModifier: nil,
+			accessModifier: descriptor(for: resolveAccessModifier(
+				from: setting.accessModifier,
+				fallingBackTo: rootAccessModifier,
+				diagnostics: context.diagnostics,
+				location: setting.$accessModifier,
+			)),
 			attributes: [],
 			isStatic: true,
 			type: .string,
@@ -84,5 +101,35 @@ package struct CodeGenerator {
 			getter: {
 				.literal(.string(value))
 			})
+	}
+
+	func resolveMemberName(for setting: ConfigurationSetting) -> String {
+		setting.swiftName ?? ""
+	}
+
+	func resolveAccessModifier(
+		from value: String?,
+		fallingBackTo defaultValue: AccessModifier,
+		diagnostics: some DiagnosticCollector,
+		location: SourceLocation?,
+	) -> AccessModifier {
+		guard let value else {
+			return defaultValue
+		}
+		if let accessModifier = AccessModifier(rawValue: value) {
+			return accessModifier
+		}
+		diagnostics.warning("Invalid access modifier: '\(value)'. Falling back to '\(defaultValue.rawValue)'.", location: location)
+		return defaultValue
+	}
+
+	func descriptor(for accessModifier: AccessModifier) -> AccessModifierDescriptor {
+		switch accessModifier {
+		case .public: .public
+		case .package: .package
+		case .internal: .internal
+		case .fileprivate: .fileprivate
+		case .private: .private
+		}
 	}
 }

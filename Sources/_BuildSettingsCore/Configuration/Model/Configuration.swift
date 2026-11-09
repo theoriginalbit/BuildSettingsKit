@@ -12,6 +12,19 @@ package struct Configuration: Decodable {
 	@SourceLocatable
 	package var typeName: String?
 
+	/// The access modifier to attach to the generated enum and members. Defaults to `internal`.
+	@SourceLocatable
+	package var accessModifier: String?
+
+	/// The build settings to locate and generate members for.
 	@SourceLocatable
 	package var settings: ConfigurationSettings
+}
+
+package enum AccessModifier: String {
+	case `public`
+	case package
+	case `internal`
+	case `fileprivate`
+	case `private`
 }
