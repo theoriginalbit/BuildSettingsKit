@@ -10,14 +10,14 @@ package struct Diagnostic: Error, Sendable {
 		case fault
 		case error
 		case warning
-		case notice
+		case note
 		case info
 
 		/// Minimum severity shown for a given `-v` count.
 		package init(verbosity: Int) {
 			switch verbosity {
 			case ...0: self = .warning	// default: warnings + errors + faults
-			case 1:    self = .notice	// -v
+			case 1:    self = .note		// -v
 			default:   self = .info		// -vv and up
 			}
 		}
@@ -29,8 +29,8 @@ package struct Diagnostic: Error, Sendable {
 }
 
 package extension Diagnostic {
-	static func notice(_ message: String, location: SourceLocation? = nil) -> Self {
-		Self(severity: .notice, message: message, location: location)
+	static func note(_ message: String, location: SourceLocation? = nil) -> Self {
+		Self(severity: .note, message: message, location: location)
 	}
 
 	static func info(_ message: String, location: SourceLocation? = nil) -> Self {

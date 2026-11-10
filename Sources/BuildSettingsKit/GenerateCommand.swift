@@ -69,7 +69,6 @@ struct GenerateCommand: ParsableCommand {
 			environment: env,
 			config: config,
 			outputURL: resolvedOutputURL(relativeTo: configURL, using: config),
-			verbosity: verbose,
 			diagnostics: diagnosticsCollector,
 		)
 		let generator = CodeGenerator()

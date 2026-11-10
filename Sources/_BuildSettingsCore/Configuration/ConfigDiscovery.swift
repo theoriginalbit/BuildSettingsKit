@@ -43,9 +43,7 @@ package enum ConfigDiscovery {
 }
 
 package extension ConfigDiscovery {
-	static func resolvedConfigURL(_ config: URL?) throws(GeneratorError) -> URL {
-		let fileManager = FileManager.default
-
+	static func resolvedConfigURL(_ config: URL?, fileManager: FileManager = .default) throws(GeneratorError) -> URL {
 		// Invocation provided.
 		if let config {
 			guard config.isFileURL, fileManager.fileExists(atPath: config.path()) else {

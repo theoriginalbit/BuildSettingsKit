@@ -28,7 +28,7 @@ package extension GeneratorError {
 	@inlinable
 	static func ambiguousConfig(candidates: [String]) -> Self {
 		let list = candidates
-			.map { "  \($0)" }
+			.map { "  - \($0)" }
 			.joined(separator: "\n")
 
 		return GeneratorError(

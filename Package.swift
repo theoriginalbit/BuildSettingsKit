@@ -37,6 +37,12 @@ let package = Package(
 			],
 		),
 		.testTarget(
+			name: "_BuildSettingsCoreTests",
+			dependencies: [
+				.target(name: "_BuildSettingsCore"),
+			],
+		),
+		.testTarget(
 			name: "BuildSettingsKitTests",
 			dependencies: [
 				.target(name: "BuildSettingsKit"),

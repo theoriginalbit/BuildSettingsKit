@@ -42,8 +42,8 @@ package extension DiagnosticCollector {
 		return "\(prefix)\(diagnostic.severity): \(diagnostic.message)"
 	}
 
-	func notice(_ message: String, location: SourceLocation? = nil) {
-		self.emit(.notice(message, location: location))
+	func note(_ message: String, location: SourceLocation? = nil) {
+		self.emit(.note(message, location: location))
 	}
 
 	func info(_ message: String, location: SourceLocation? = nil) {

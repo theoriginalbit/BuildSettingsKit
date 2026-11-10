@@ -41,7 +41,7 @@ package struct StandardDiagnosticCollector<StdOut: DiagnosticOutputHandle, StdEr
 		let message = describe(diagnostic) + "\n"
 
 		switch diagnostic.severity {
-		case .notice, .info, .warning:
+		case .note, .info, .warning:
 			stdOut.write(Data(message.utf8))
 		case .error:
 			hasErrors = true
