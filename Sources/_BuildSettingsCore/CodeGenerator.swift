@@ -62,7 +62,15 @@ package struct CodeGenerator {
 			at: outputURL.deletingLastPathComponent(),
 			withIntermediateDirectories: true
 		)
-		try file.render(to: outputURL, indentUsing: .spaces(2))
+
+		let newData = file.render(indentUsing: .spaces(2))
+
+		if let existingData = try? Data(contentsOf: outputURL), existingData == newData {
+			// Content is identical, no write needed otherwise we would update the modified time
+			return
+		}
+
+		try newData.write(to: outputURL, options: .atomic)
 
 		// Abort if any diagnostic errors were prevented complete generation
 		guard !context.diagnostics.hasErrors else {
