@@ -68,12 +68,12 @@ import Testing
     }
 
 	static let camelCaseConversionTable = [
-		("", ""), ("MARKETING_VERSION", "marketingVersion"),
+		("", nil), ("MARKETING_VERSION", "marketingVersion"),
 		("PRODUCT_BUNDLE_IDENTIFIER", "productBundleIdentifier"),
 		("SINGLE", "single"), ("already_camel_case", "alreadyCamelCase"),
 		("UPPER_AND_LOWER_mixed", "upperAndLowerMixed"), ("FOO__BAR", "fooBar"),
 	]
-	@Test(arguments: Self.camelCaseConversionTable) func `camelCased conversion`(_ input: String, _ expected: String) {
-        #expect(Identifier.camelCased(input) == expected)
+	@Test(arguments: Self.camelCaseConversionTable) func `camelCased conversion`(_ input: String, _ expected: String?) {
+		#expect(Identifier.camelCased(input)?.value == expected)
     }
 }

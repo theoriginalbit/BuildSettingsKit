@@ -32,11 +32,12 @@ struct Identifier {
 		return role == .typeName ? isUpper : !isUpper
 	}
 
-	static func camelCased(_ value: String) -> String {
-		if value.isEmpty { return "" }
+	static func camelCased(_ value: String) -> Identifier? {
+		if value.isEmpty { return nil }
 		let parts = value.lowercased().split(separator: "_")
-		guard let first = parts.first, !first.isEmpty else { return "" }
-		return String(first) + parts.dropFirst().map { $0.capitalized }.joined()
+		guard let first = parts.first, !first.isEmpty else { return nil }
+		let result = String(first) + parts.dropFirst().map { $0.capitalized }.joined()
+		return Identifier(result)
 	}
 
 	static func isValid(_ value: String) -> Bool {

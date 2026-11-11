@@ -130,9 +130,14 @@ package struct CodeGenerator {
 
 	func resolveMemberName(for setting: ConfigurationSetting, diagnostics: some DiagnosticCollector) -> String? {
 		guard let swiftName = setting.swiftName else {
-			// assumption: keys should be simple enough to only need
-			// passing through a simple transformation
-			return Identifier.camelCased(setting.key)
+			guard let identifier = Identifier.camelCased(setting.key) else {
+				diagnostics.error(
+					"Unable to turn '\(setting.key)' into valid identifier. Please specify with swiftName.",
+					location: setting.$key
+				)
+				return nil
+			}
+			return identifier.value
 		}
 		guard let identifier = Identifier(swiftName) else {
 			diagnostics.error(
