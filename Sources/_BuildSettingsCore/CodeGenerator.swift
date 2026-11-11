@@ -101,18 +101,10 @@ package struct CodeGenerator {
 	func generateSettingProperty(
 		_ setting: ConfigurationSetting,
 		rootAccessModifier: AccessModifier,
-		with context: Context<some DiagnosticCollector>
+		with context: Context<some DiagnosticCollector>,
 	) -> PropertyDescriptor? {
-		guard let value = context.environment[setting.key] else {
-			context.diagnostics.error(
-				"No matching key in environment: '\(setting.key)'",
-				location: setting.$key
-			)
-			return nil
-		}
-		guard let identifier = resolveMemberName(for: setting, diagnostics: context.diagnostics),
-			  let type = resolveType(for: setting, diagnostics: context.diagnostics),
-			  let expression = resolveLiteral(value, for: type, diagnostics: context.diagnostics, location: setting.$key)
+		guard let identifier = resolveMemberName(for: setting, with: context),
+			  let (type, expression) = resolveTypeAndValue(for: setting, with: context)
 		else { return nil }
 		guard let accessModifier = resolveAccessModifier(
 			from: setting.accessModifier,
@@ -130,10 +122,44 @@ package struct CodeGenerator {
 		)
 	}
 
-	func resolveMemberName(for setting: ConfigurationSetting, diagnostics: some DiagnosticCollector) -> String? {
+	func resolveTypeAndValue(
+		for setting: ConfigurationSetting,
+		with context: Context<some DiagnosticCollector>,
+	) -> (SettingType, ExpressionDescriptor)? {
+		guard let type = resolveType(for: setting, diagnostics: context.diagnostics) else {
+			return nil
+		}
+		if let value = context.environment[setting.key] {
+			guard let expression = resolveExpression(value, type: type, with: context, at: setting.$key) else {
+				// no need to output diagnostic, resolveExpression does it
+				return nil
+			}
+			return (type, expression)
+		}
+		// There was no value in the environment, check if the config defined a default
+		// and validate that it can represent the type that was defined.
+		if let value = setting.default {
+			guard let expression = resolveExpression(value, type: type, with: context, at: setting.$key) else {
+				// no need to output diagnostic, resolveExpression does it
+				return nil
+			}
+			return (type, expression)
+		}
+
+		context.diagnostics.error(
+			"No matching key in environment: '\(setting.key)' and no default value supplied",
+			location: setting.$key
+		)
+		return nil
+	}
+
+	func resolveMemberName(
+		for setting: ConfigurationSetting,
+		with context: Context<some DiagnosticCollector>,
+	) -> String? {
 		guard let swiftName = setting.swiftName else {
 			guard let identifier = Identifier.camelCased(setting.key) else {
-				diagnostics.error(
+				context.diagnostics.error(
 					"Unable to turn '\(setting.key)' into valid identifier. Please specify with swiftName.",
 					location: setting.$key
 				)
@@ -142,14 +168,14 @@ package struct CodeGenerator {
 			return identifier.value
 		}
 		guard let identifier = Identifier(swiftName) else {
-			diagnostics.error(
+			context.diagnostics.error(
 				"Invalid identifier: '\(swiftName)'",
 				location: setting.$swiftName
 			)
 			return nil
 		}
 		if !identifier.followsNamingConvention(.memberName) {
-			diagnostics.warning(
+			context.diagnostics.warning(
 				"Identifier does not follow member naming convention of lowerCamelCase",
 				location: setting.$swiftName
 			)
@@ -204,14 +230,14 @@ package struct CodeGenerator {
 		}
 	}
 
-	func resolveLiteral(
+	func resolveExpression(
 		_ value: String,
-		for settingType: SettingType,
-		diagnostics: some DiagnosticCollector,
-		location: SourceLocation?,
+		type: SettingType,
+		with context: Context<some DiagnosticCollector>,
+		at location: SourceLocation?,
 	) -> ExpressionDescriptor? {
 		do {
-			return switch settingType {
+			return switch type {
 			case .string: .literal(.string(value))
 			case .bool: try boolLiteral(value)
 			case .int: try intLiteral(value)
@@ -220,9 +246,9 @@ package struct CodeGenerator {
 			}
 		} catch {
 			if let expected = error.expected {
-				diagnostics.error("Could not convert value '\(value)' to \(error.type) (expected \(expected))", location: location)
+				context.diagnostics.error("Could not convert value '\(value)' to \(error.type) (expected \(expected))", location: location)
 			} else {
-				diagnostics.error("Could not convert value '\(value)' to \(error.type)", location: location)
+				context.diagnostics.error("Could not convert value '\(value)' to \(error.type)", location: location)
 			}
 			return nil
 		}
