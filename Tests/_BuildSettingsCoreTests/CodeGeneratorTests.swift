@@ -215,7 +215,7 @@ import SwiftStructureKit
         #expect(diagnostics.warnings.contains { $0.message.contains("UpperCamelCase") })
     }
 
-	@Test func `Invalid access modifier emits warning and falls back`() throws {
+	@Test func `Invalid access modifier emits error`() throws {
 		let yaml = """
 			accessModifier: invalidModifier
 			settings:
@@ -235,14 +235,14 @@ import SwiftStructureKit
 			diagnostics: diagnostics
 		)
 
-		let generator = CodeGenerator()
-		try generator.run(with: context)
+		#expect(throws: GeneratorError.self) {
+			try CodeGenerator().run(with: context)
+		}
 
-		#expect(!diagnostics.hasErrors)
-		#expect(diagnostics.warnings.contains { $0.message.contains("Invalid access modifier: 'invalidModifier'") })
+		#expect(diagnostics.hasErrors)
+		#expect(diagnostics.errors.contains { $0.message.contains("Invalid access modifier: 'invalidModifier'") })
 
-		let generatedSwift = try String(contentsOf: outputURL, encoding: .utf8)
-		#expect(generatedSwift.contains("internal enum BuildSettings"))
+		#expect(FileManager.default.fileExists(atPath: outputURL.path()) == false)
 	}
 
 	// MARK: Setting property validation

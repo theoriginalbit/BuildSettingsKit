@@ -18,12 +18,12 @@ package struct CodeGenerator {
 			context.diagnostics.error("Must supply at least one setting to codegen", location: config.$settings)
 		}
 
-		let configAccessModifier = resolveAccessModifier(
+		guard let configAccessModifier = resolveAccessModifier(
 			from: config.accessModifier,
 			fallingBackTo: .internal,
 			diagnostics: context.diagnostics,
 			location: config.$accessModifier,
-		)
+		) else { throw GeneratorError.generationFailed }
 
 		guard let typeName = resolveTypeName(from: context) else {
 			// no point in generating anything if the type name is invalid
@@ -114,15 +114,16 @@ package struct CodeGenerator {
 			  let type = resolveType(for: setting, diagnostics: context.diagnostics),
 			  let expression = resolveLiteral(value, for: type, diagnostics: context.diagnostics, location: setting.$key)
 		else { return nil }
+		guard let accessModifier = resolveAccessModifier(
+			from: setting.accessModifier,
+			fallingBackTo: rootAccessModifier,
+			diagnostics: context.diagnostics,
+			location: setting.$accessModifier,
+		) else { return nil }
 		return .computed(
 			identifier,
 			comment: setting.comment.map(DocCommentDescriptor.init(_:)),
-			accessModifier: descriptor(for: resolveAccessModifier(
-				from: setting.accessModifier,
-				fallingBackTo: rootAccessModifier,
-				diagnostics: context.diagnostics,
-				location: setting.$accessModifier,
-			)),
+			accessModifier: descriptor(for: accessModifier),
 			isStatic: true,
 			type: typeReference(for: type),
 			getter: { expression })
@@ -160,15 +161,15 @@ package struct CodeGenerator {
 		fallingBackTo defaultValue: AccessModifier,
 		diagnostics: some DiagnosticCollector,
 		location: SourceLocation?,
-	) -> AccessModifier {
+	) -> AccessModifier? {
 		guard let value else {
 			return defaultValue
 		}
 		if let accessModifier = AccessModifier(rawValue: value) {
 			return accessModifier
 		}
-		diagnostics.warning("Invalid access modifier: '\(value)' falling back to '\(defaultValue.rawValue)'", location: location)
-		return defaultValue
+		diagnostics.error("Invalid access modifier: '\(value)' falling back to '\(defaultValue.rawValue)'", location: location)
+		return nil
 	}
 
 	func descriptor(for accessModifier: AccessModifier) -> AccessModifierDescriptor {
