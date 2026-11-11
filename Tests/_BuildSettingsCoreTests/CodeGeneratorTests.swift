@@ -82,25 +82,15 @@ import SwiftStructureKit
 			/// App configuration settings
 			public enum AppSettings {
 			  /// The application title
-			  public static var appName: String {
-			    "MyAwesomeApp"
-			  }
+			  public static let appName: String = "MyAwesomeApp"
 
-			  public static var enableFeature: Bool {
-			    true
-			  }
+			  public static let enableFeature: Bool = true
 
-			  public static var maxRetries: Int {
-			    5
-			  }
+			  public static let maxRetries: Int = 5
 
-			  public static var timeoutSeconds: Double {
-			    12.5
-			  }
+			  public static let timeoutSeconds: Double = 12.5
 
-			  internal static var apiEndpoint: URL {
-			    URL(string: "https://api.example.com")!
-			  }
+			  internal static let apiEndpoint: URL = URL(string: "https://api.example.com")!
 			}
 
 			"""

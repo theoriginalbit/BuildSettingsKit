@@ -120,13 +120,14 @@ package struct CodeGenerator {
 			diagnostics: context.diagnostics,
 			location: setting.$accessModifier,
 		) else { return nil }
-		return .computed(
+		return .let(
 			identifier,
 			comment: setting.comment.map(DocCommentDescriptor.init(_:)),
 			accessModifier: descriptor(for: accessModifier),
 			isStatic: true,
 			type: typeReference(for: type),
-			getter: { expression })
+			defaultValue: expression
+		)
 	}
 
 	func resolveMemberName(for setting: ConfigurationSetting, diagnostics: some DiagnosticCollector) -> String? {
