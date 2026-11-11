@@ -394,7 +394,7 @@ import SwiftStructureKit
 		let generator = CodeGenerator()
 
 		let intDesc = try generator.intLiteral("123")
-		if case let .literal(.integer(val)) = intDesc {
+		if case let .literal(.integer(.decimal(val))) = intDesc {
 			#expect(val == 123)
 		} else {
 			Issue.record("Expected .literal(.integer(123))")
@@ -420,11 +420,22 @@ import SwiftStructureKit
 
 	@Test func `URL literal conversions`() throws {
 		let urlDesc = try CodeGenerator().urlLiteral("https://apple.com")
-		if case let .raw(val) = urlDesc {
-			#expect(val == #"URL(string: "https://apple.com")!"#)
+		if case let .forcedValue(.functionCall(descriptor)) = urlDesc {
+			if case let .identifier(identifier) = descriptor.calledExpression {
+				#expect(identifier.components == ["URL"])
+				#expect(descriptor.arguments.count == 1)
+				let argument = try #require(descriptor.arguments.first)
+				#expect(argument.label == "string")
+				if case let .literal(.string(val)) = argument.value {
+					#expect(val == "https://apple.com")
+				} else {
+					Issue.record("Expected URL string argument to be a string literal")
+				}
+			} else {
+				Issue.record("Expected functionCall identifier to be URL")
+			}
 		} else {
-			Issue.record("Expected .raw URL")
+			Issue.record("Expected .forcedValue(.functionCall) for guaranteed URL construction")
 		}
-		// Note for future self: it's nearly impossible to fail URL(string:)
 	}
 }

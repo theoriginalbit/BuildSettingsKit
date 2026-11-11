@@ -16,14 +16,14 @@ let package = Package(
 	dependencies: [
 		.package(url: "https://github.com/jpsim/Yams", .upToNextMinor(from: "6.2.2")),
 		.package(url: "https://github.com/apple/swift-argument-parser", .upToNextMinor(from: "1.8.2")),
-		.package(url: "https://github.com/theoriginalbit/SwiftStructureKit", .upToNextMajor(from: "3.0.0")),
+		.package(url: "https://github.com/theoriginalbit/SwiftStructureKit", .upToNextMajor(from: "4.0.0")),
 	],
 	targets: [
 		.target(
 			name: "_BuildSettingsCore",
 			dependencies: [
 				.product(name: "Yams", package: "Yams"),
-				.product(name: "SwiftStructureKit", package: "SwiftStructureKit"),
+				.product(name: "StructureKit", package: "SwiftStructureKit"),
 			]
 		),
 		.executableTarget(

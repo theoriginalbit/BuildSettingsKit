@@ -278,9 +278,14 @@ package struct CodeGenerator {
 	}
 
 	func urlLiteral(_ rawValue: String) throws(LiteralConversionError) -> ExpressionDescriptor {
+		// Note for future self: I've never seen URL(string:) fail, but just test it anyway.
 		guard URL(string: rawValue) != nil else {
 			throw LiteralConversionError(type: "URL", expected: nil)
 		}
-		return .raw(#"URL(string: "\#(rawValue)")!"#)
+		return .forcedValue(
+			.functionCall(.identifier("URL"), ArgumentsList {
+				Argument(label: "string", value: .literal(.string(rawValue)))
+			})
+		)
 	}
 }
