@@ -27,7 +27,7 @@ import Testing
 	@Test func `no config error output`() {
 		let error = GeneratorError.noConfigFound(searchRoot: "/root/dir")
 		#expect(error.stage == .config)
-		#expect(error.description == "No configuration file not found. Provide --config argument or add a configuration file in '/root/dir'.")
+		#expect(error.description == "No configuration file found. Provide --config argument or add a configuration file in '/root/dir'.")
 	}
 
 	@Test func `empty config error output`() {

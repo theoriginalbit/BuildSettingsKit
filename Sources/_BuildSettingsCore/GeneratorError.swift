@@ -45,7 +45,7 @@ package extension GeneratorError {
 	static func noConfigFound(searchRoot: String) -> Self {
 		GeneratorError(
 			stage: .config,
-			message: "No configuration file not found. Provide --config argument or add a configuration file in '\(searchRoot)'."
+			message: "No configuration file found. Provide --config argument or add a configuration file in '\(searchRoot)'."
 		)
 	}
 

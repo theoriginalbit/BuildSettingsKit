@@ -53,8 +53,8 @@ import Testing
 
 		// With file only (no line/column)
 		let loc3 = SourceLocation(file: file, line: nil, column: nil)
-		let desc3 = collector.describe(.info("Loaded", location: loc3))
-		#expect(desc3 == "\(outputPath): info: Loaded")
+		let desc3 = collector.describe(.note("Loaded", location: loc3))
+		#expect(desc3 == "\(outputPath): note: Loaded")
 
 		// Without source location
 		let desc4 = collector.describe(.note("Global notice"))

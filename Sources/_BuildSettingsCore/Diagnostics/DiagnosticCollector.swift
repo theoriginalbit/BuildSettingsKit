@@ -28,7 +28,7 @@ package extension DiagnosticCollector {
 		if let location = diagnostic.location {
 			let filePath = switch mode {
 			case .cli: location.file.lastPathComponent
-			case .xcode: location.file.path()
+			case .xcode: location.file.path(percentEncoded: false)
 			}
 			prefix = "\(filePath):"
 			if let line = location.line {
@@ -39,7 +39,16 @@ package extension DiagnosticCollector {
 			}
 			prefix += " "
 		}
-		return "\(prefix)\(diagnostic.severity): \(diagnostic.message)"
+		let severity = switch diagnostic.severity {
+		case .fault where mode == .xcode: "error"
+		case .fault: "fault"
+		case .error: "error"
+		case .warning: "warning"
+		case .note: "note"
+		case .info where mode == .xcode: "note"
+		case .info: "info"
+		}
+		return "\(prefix)\(severity): \(diagnostic.message)"
 	}
 
 	func note(_ message: String, location: SourceLocation? = nil) {
