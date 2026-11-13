@@ -52,6 +52,13 @@ let package = Package(
 			name: "GitVersionPlugin",
 			capability: .buildTool(),
 		),
+		.plugin(
+			name: "BuildSettingsKitPlugin",
+			capability: .buildTool(),
+			dependencies: [
+				.target(name: "BuildSettingsKit"),
+			],
+		),
 	]
 )
 

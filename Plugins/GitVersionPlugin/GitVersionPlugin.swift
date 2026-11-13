@@ -5,8 +5,7 @@
 import Foundation
 import PackagePlugin
 
-@main
-struct GitVersionPlugin: BuildToolPlugin {
+@main struct GitVersionPlugin: BuildToolPlugin {
 	func createBuildCommands(context: PluginContext, target: Target) throws -> [Command] {
 		let version = gitVersion(in: context.package.directoryURL)
 		let output = context.pluginWorkDirectoryURL.appending(path: "GitVersion.swift")

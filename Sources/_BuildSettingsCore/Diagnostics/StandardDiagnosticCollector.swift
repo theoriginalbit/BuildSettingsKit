@@ -27,12 +27,12 @@ package struct StandardDiagnosticCollector<StdOut: DiagnosticOutputHandle, StdEr
 	package init(
 		stdOut: StdOut = FileHandle.standardOutput,
 		stdErr: StdErr = FileHandle.standardError,
-		diagnosticMode: DiagnosticMode,
+		mode: DiagnosticMode,
 		verbosity: Int,
 	) {
 		self.stdOut = stdOut
 		self.stdErr = stdErr
-		self.mode = diagnosticMode
+		self.mode = mode
 		self.verbosity = Diagnostic.Severity(verbosity: verbosity)
 	}
 

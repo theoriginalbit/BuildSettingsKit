@@ -1,0 +1,1 @@
+../../Sources/BuildSettingsKit/ConfigDiscovery.swift
