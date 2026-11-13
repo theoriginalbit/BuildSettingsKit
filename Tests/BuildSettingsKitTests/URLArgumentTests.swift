@@ -4,7 +4,7 @@
 
 import Foundation
 import Testing
-@testable import BuildSettingsKit
+@testable import gensettings
 
 @Test func `URL ExpressibleByArgument conformance`() {
 	let url = URL(argument: "/path/to/my/project")

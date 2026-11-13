@@ -1,1 +1,1 @@
-../../Sources/BuildSettingsKit/ConfigDiscovery.swift
+../../Sources/gensettings/ConfigDiscovery.swift

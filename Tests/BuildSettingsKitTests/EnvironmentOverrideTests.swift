@@ -3,7 +3,7 @@
 //
 
 import Testing
-@testable import BuildSettingsKit
+@testable import gensettings
 
 @Suite struct EnvironmentOverrideTests {
 	@Test func `Parsing a simple key value pair`() {

@@ -1,1 +1,1 @@
-../../Sources/BuildSettingsKit/Constants.swift
+../../Sources/gensettings/Constants.swift

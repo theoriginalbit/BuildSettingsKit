@@ -13,7 +13,7 @@ import Testing
 		let collector = StandardDiagnosticCollector(
 			stdOut: stdOut,
 			stdErr: stdErr,
-			diagnosticMode: .cli,
+			mode: .cli,
 			verbosity: 2 // allow info, notice, warning, error
 		)
 
@@ -43,7 +43,7 @@ import Testing
 		let collector = StandardDiagnosticCollector(
 			stdOut: stdOut,
 			stdErr: stdErr,
-			diagnosticMode: .cli,
+			mode: .cli,
 			verbosity: 0 // warnings, errors, faults only
 		)
 

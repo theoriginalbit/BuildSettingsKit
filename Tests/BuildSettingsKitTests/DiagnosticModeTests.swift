@@ -4,7 +4,7 @@
 
 import Testing
 import _BuildSettingsCore
-@testable import BuildSettingsKit
+@testable import gensettings
 
 @Suite struct DiagnosticModeTests {
 	@Test func `Ensure DiagnosticMode.allCases returns all cases`() {

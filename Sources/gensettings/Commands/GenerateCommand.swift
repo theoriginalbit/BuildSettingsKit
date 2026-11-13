@@ -41,7 +41,7 @@ struct GenerateCommand: ParsableCommand {
 			valueName: "KEY=VALUE",
 		),
 	)
-	private var env: [EnvironmentOverride]
+	private var env: [EnvironmentOverride] = []
 
 	@Flag(
 		exclusivity: .exclusive,
