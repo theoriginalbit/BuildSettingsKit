@@ -19,6 +19,8 @@ extension SettingType: Equatable {
 		case (.url, _): false
 		case let (.array(lhs), .array(rhs)): lhs == rhs
 		case (.array, _): false
+		case let (.optional(lhs), .optional(rhs)): lhs == rhs
+		case (.optional, _): false
 		}
 	}
 }

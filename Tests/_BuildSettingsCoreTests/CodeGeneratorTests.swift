@@ -45,6 +45,8 @@ import SwiftStructureKitTestSupport
 			    type: URL
 			    swiftName: apiEndpoint
 			    accessModifier: internal
+			  - key: API_KEY
+			    type: String?
 			"""
 
 		let config = try makeConfig(from: yaml)

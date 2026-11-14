@@ -145,7 +145,9 @@ package struct CodeGenerator {
 			}
 			return (type, expression)
 		}
-
+		if case let .optional(wrappedType) = type {
+			return (type, .literal(nil))
+		}
 		context.diagnostics.error(
 			"No matching key in environment: '\(setting.key)' and no default value supplied",
 			location: setting.$key
@@ -228,6 +230,7 @@ package struct CodeGenerator {
 		case .double: .double
 		case .url: .identifier("URL")
 		case .array(let elementType): .array(typeReference(for: elementType))
+		case .optional(let wrappedType): .optional(typeReference(for: wrappedType))
 		}
 	}
 
@@ -245,6 +248,7 @@ package struct CodeGenerator {
 			case .double: try doubleLiteral(value)
 			case .url: try urlLiteral(value)
 			case .array(let elementType): try arrayLiteral(value, elementType: elementType, with: context, at: location)
+			case .optional(let wrappedType): try optionalLiteral(value, elementType: wrappedType, with: context, at: location)
 			}
 		} catch {
 			if let expected = error.expected {
@@ -307,5 +311,17 @@ package struct CodeGenerator {
 			arrayValues.append(expression)
 		}
 		return .literal(.array(arrayValues))
+	}
+
+	func optionalLiteral(
+		_ rawValue: String,
+		elementType: SettingType,
+		with context: Context<some DiagnosticCollector>,
+		at location: SourceLocation?,
+	) throws(LiteralConversionError) -> ExpressionDescriptor {
+		guard let expression = resolveExpression(rawValue, type: elementType, with: context, at: location) else {
+			return .literal(.nil)
+		}
+		return expression
 	}
 }

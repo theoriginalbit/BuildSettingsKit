@@ -24,4 +24,6 @@ public enum AppSettings {
 	]
 
 	internal static let apiEndpoint: URL = URL(string: "https://api.example.com")!
+
+	public static let apiKey: Optional<String> = nil
 }

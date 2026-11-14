@@ -9,6 +9,7 @@ indirect enum SettingType: Sendable, Decodable {
 	case double
 	case url
 	case array(SettingType)
+	case optional(SettingType)
 
 	init?(parsing rawValue: String) {
 		if let primitive = Primitive(rawValue: rawValue) {
@@ -19,6 +20,10 @@ indirect enum SettingType: Sendable, Decodable {
 			case .double: .double
 			case .url: .url
 			}
+		} else if rawValue.hasSuffix("?") { // parse ? first because it's imbalanced
+			let inner = String(rawValue.dropLast())
+			guard let element = Self(parsing: inner) else { return nil }
+			self = .optional(element)
 		} else if rawValue.hasPrefix("["), rawValue.hasSuffix("]") {
             let inner = String(rawValue.dropFirst().dropLast())
 			guard let element = Self(parsing: inner) else { return nil }
