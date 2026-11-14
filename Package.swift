@@ -44,6 +44,10 @@ let package = Package(
 			name: "_BuildSettingsCoreTests",
 			dependencies: [
 				.target(name: "_BuildSettingsCore"),
+				.product(name: "SwiftStructureKitTestSupport", package: "SwiftStructureKit"),
+			],
+			resources: [
+				.copy("Resources"),
 			],
 		),
 		.testTarget(

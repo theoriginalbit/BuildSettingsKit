@@ -48,4 +48,9 @@ package struct ConfigurationSettings: RandomAccessCollection, Decodable {
 			_storage = try container.decode([ConfigurationSetting].self)
 		}
 	}
+
+	package init(_storage: [ConfigurationSetting], location: SourceLocation? = nil) {
+		self._storage = _storage
+		self.location = location
+	}
 }

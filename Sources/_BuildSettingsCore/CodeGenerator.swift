@@ -63,7 +63,7 @@ package struct CodeGenerator {
 			withIntermediateDirectories: true
 		)
 
-		let newData = file.render(indentUsing: .spaces(2))
+		let newData = file.render(indentUsing: .tabs)
 
 		if let existingData = try? Data(contentsOf: outputURL), existingData == newData {
 			// Content is identical, no write needed otherwise we would update the modified time
@@ -210,7 +210,7 @@ package struct CodeGenerator {
 	}
 
 	func resolveType(for setting: ConfigurationSetting, diagnostics: some DiagnosticCollector) -> SettingType? {
-		guard let type = SettingType(rawValue: setting.type) else {
+		guard let type = SettingType(parsing: setting.type) else {
 			diagnostics.error(
 				"Invalid setting type: '\(setting.type)'",
 				location: setting.$type
@@ -227,6 +227,7 @@ package struct CodeGenerator {
 		case .int: .int
 		case .double: .double
 		case .url: .identifier("URL")
+		case .array(let elementType): .array(typeReference(for: elementType))
 		}
 	}
 
@@ -243,6 +244,7 @@ package struct CodeGenerator {
 			case .int: try intLiteral(value)
 			case .double: try doubleLiteral(value)
 			case .url: try urlLiteral(value)
+			case .array(let elementType): try arrayLiteral(value, elementType: elementType, with: context, at: location)
 			}
 		} catch {
 			if let expected = error.expected {
@@ -287,5 +289,23 @@ package struct CodeGenerator {
 				Argument(label: "string", value: .literal(.string(rawValue)))
 			})
 		)
+	}
+
+	func arrayLiteral(
+		_ rawValue: String,
+		elementType: SettingType,
+		with context: Context<some DiagnosticCollector>,
+		at location: SourceLocation?,
+	) throws(LiteralConversionError) -> ExpressionDescriptor? {
+		let rawArrayValues = rawValue.components(separatedBy: " ")
+
+		var arrayValues: [ExpressionDescriptor] = []
+		for rawValue in rawArrayValues {
+			guard let expression = resolveExpression(rawValue, type: elementType, with: context, at: location) else {
+				return nil
+			}
+			arrayValues.append(expression)
+		}
+		return .literal(.array(arrayValues))
 	}
 }

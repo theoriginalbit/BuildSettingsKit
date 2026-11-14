@@ -2,7 +2,7 @@
 // Copyright © 2026 BuildSettingsKit. All rights reserved.
 //
 
-package struct ConfigurationSetting: Decodable {
+package struct ConfigurationSetting {
 	/// The build setting to locate in the environment.
 	@SourceLocatable
 	package var key: String
@@ -27,3 +27,5 @@ package struct ConfigurationSetting: Decodable {
 	@SourceLocatable
 	package var comment: String?
 }
+
+extension ConfigurationSetting: Decodable {}

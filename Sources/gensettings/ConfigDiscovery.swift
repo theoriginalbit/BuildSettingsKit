@@ -66,7 +66,7 @@ enum ConfigDiscovery {
 		return matchedConfigs[0]
 	}
 
-	private static func isSupportedConfigFileName(_ url: URL) -> Bool {
+	static func isSupportedConfigFileName(_ url: URL) -> Bool {
 		let fileName = url.lastPathComponent
 		for acceptedFileName in supportedConfigFiles where fileName.caseInsensitiveCompare(acceptedFileName) == .orderedSame {
 			return true

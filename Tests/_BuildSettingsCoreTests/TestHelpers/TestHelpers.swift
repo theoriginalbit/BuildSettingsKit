@@ -9,6 +9,11 @@ final class TestDiagnosticCollector: DiagnosticCollector, @unchecked Sendable {
     let mode: DiagnosticMode
     var verbosity: Diagnostic.Severity
     var diagnostics: [Diagnostic] = []
+	var writeToConsole: Bool = false
+
+	var didEmitAnything: Bool {
+		!diagnostics.isEmpty
+	}
 
     var hasErrors: Bool {
         return diagnostics.contains { $0.severity == .error }
@@ -37,6 +42,7 @@ final class TestDiagnosticCollector: DiagnosticCollector, @unchecked Sendable {
 
     func emit(_ diagnostic: Diagnostic) {
         guard canEmit(diagnostic) else { return }
+		if writeToConsole { print(diagnostic.message) }
         diagnostics.append(diagnostic)
     }
 }
