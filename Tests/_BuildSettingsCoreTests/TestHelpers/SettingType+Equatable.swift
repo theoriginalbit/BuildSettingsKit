@@ -5,7 +5,7 @@
 @testable import _BuildSettingsCore
 
 extension SettingType: Equatable {
-	public static func ==(lhs: SettingType, rhs: SettingType) -> Bool {
+	public static func == (lhs: SettingType, rhs: SettingType) -> Bool {
 		switch (lhs, rhs) {
 		case (.string, .string): true
 		case (.string, _): false

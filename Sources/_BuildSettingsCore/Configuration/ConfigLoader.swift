@@ -2,10 +2,10 @@
 // Copyright © 2026 BuildSettingsKit. All rights reserved.
 //
 
-import struct Foundation.URL
 import struct Foundation.Data
-import class Yams.YAMLDecoder
+import struct Foundation.URL
 import func Yams.compose
+import class Yams.YAMLDecoder
 
 package enum ConfigLoader {
 	package static func load(from configURL: URL) throws(GeneratorError) -> Configuration {

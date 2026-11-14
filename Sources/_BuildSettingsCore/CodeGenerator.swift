@@ -60,7 +60,7 @@ package struct CodeGenerator {
 
 		try FileManager.default.createDirectory(
 			at: outputURL.deletingLastPathComponent(),
-			withIntermediateDirectories: true
+			withIntermediateDirectories: true,
 		)
 
 		let newData = file.render(indentUsing: .tabs)
@@ -85,14 +85,14 @@ package struct CodeGenerator {
 		guard let identifier = Identifier(typeName) else {
 			context.diagnostics.error(
 				"Invalid Swift identifier: '\(typeName)'",
-				location: context.config.$typeName
+				location: context.config.$typeName,
 			)
 			return nil
 		}
 		if !identifier.followsNamingConvention(.typeName) {
 			context.diagnostics.warning(
 				"Identifier does not follow type naming convention of UpperCamelCase",
-				location: context.config.$typeName
+				location: context.config.$typeName,
 			)
 		}
 		return identifier.value
@@ -104,7 +104,7 @@ package struct CodeGenerator {
 		with context: Context<some DiagnosticCollector>,
 	) -> PropertyDescriptor? {
 		guard let identifier = resolveMemberName(for: setting, with: context),
-			  let (type, expression) = resolveTypeAndValue(for: setting, with: context)
+		      let (type, expression) = resolveTypeAndValue(for: setting, with: context)
 		else { return nil }
 		guard let accessModifier = resolveAccessModifier(
 			from: setting.accessModifier,
@@ -118,7 +118,7 @@ package struct CodeGenerator {
 			accessModifier: descriptor(for: accessModifier),
 			isStatic: true,
 			type: typeReference(for: type),
-			defaultValue: expression
+			defaultValue: expression,
 		)
 	}
 
@@ -150,7 +150,7 @@ package struct CodeGenerator {
 		}
 		context.diagnostics.error(
 			"No matching key in environment: '\(setting.key)' and no default value supplied",
-			location: setting.$key
+			location: setting.$key,
 		)
 		return nil
 	}
@@ -163,7 +163,7 @@ package struct CodeGenerator {
 			guard let identifier = Identifier.camelCased(setting.key) else {
 				context.diagnostics.error(
 					"Unable to turn '\(setting.key)' into valid identifier. Please specify with swiftName.",
-					location: setting.$key
+					location: setting.$key,
 				)
 				return nil
 			}
@@ -172,14 +172,14 @@ package struct CodeGenerator {
 		guard let identifier = Identifier(swiftName) else {
 			context.diagnostics.error(
 				"Invalid identifier: '\(swiftName)'",
-				location: setting.$swiftName
+				location: setting.$swiftName,
 			)
 			return nil
 		}
 		if !identifier.followsNamingConvention(.memberName) {
 			context.diagnostics.warning(
 				"Identifier does not follow member naming convention of lowerCamelCase",
-				location: setting.$swiftName
+				location: setting.$swiftName,
 			)
 		}
 		return identifier.value
@@ -215,7 +215,7 @@ package struct CodeGenerator {
 		guard let type = SettingType(parsing: setting.type) else {
 			diagnostics.error(
 				"Invalid setting type: '\(setting.type)'",
-				location: setting.$type
+				location: setting.$type,
 			)
 			return nil
 		}
@@ -229,8 +229,8 @@ package struct CodeGenerator {
 		case .int: .int
 		case .double: .double
 		case .url: .identifier("URL")
-		case .array(let elementType): .array(typeReference(for: elementType))
-		case .optional(let wrappedType): .optional(typeReference(for: wrappedType))
+		case let .array(elementType): .array(typeReference(for: elementType))
+		case let .optional(wrappedType): .optional(typeReference(for: wrappedType))
 		}
 	}
 
@@ -247,8 +247,8 @@ package struct CodeGenerator {
 			case .int: try intLiteral(value)
 			case .double: try doubleLiteral(value)
 			case .url: try urlLiteral(value)
-			case .array(let elementType): try arrayLiteral(value, elementType: elementType, with: context, at: location)
-			case .optional(let wrappedType): try optionalLiteral(value, elementType: wrappedType, with: context, at: location)
+			case let .array(elementType): try arrayLiteral(value, elementType: elementType, with: context, at: location)
+			case let .optional(wrappedType): try optionalLiteral(value, elementType: wrappedType, with: context, at: location)
 			}
 		} catch {
 			if let expected = error.expected {
@@ -291,7 +291,7 @@ package struct CodeGenerator {
 		return .forcedValue(
 			.functionCall(.identifier("URL"), ArgumentsList {
 				Argument(label: "string", value: .literal(.string(rawValue)))
-			})
+			}),
 		)
 	}
 

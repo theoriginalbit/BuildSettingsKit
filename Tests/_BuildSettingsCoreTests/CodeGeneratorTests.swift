@@ -3,9 +3,9 @@
 //
 
 import Foundation
-import Testing
 import SwiftStructureKit
 import SwiftStructureKitTestSupport
+import Testing
 @testable import _BuildSettingsCore
 
 @Suite struct CodeGeneratorTests {
@@ -68,7 +68,7 @@ import SwiftStructureKitTestSupport
 			environment: env,
 			config: config,
 			outputURL: outputURL,
-			diagnostics: diagnostics
+			diagnostics: diagnostics,
 		)
 
 		try CodeGenerator().run(with: context)
@@ -98,7 +98,7 @@ import SwiftStructureKitTestSupport
 			environment: [:],
 			config: config,
 			outputURL: outputURL,
-			diagnostics: diagnostics
+			diagnostics: diagnostics,
 		)
 
 		#expect(throws: GeneratorError.self) {
@@ -126,7 +126,7 @@ import SwiftStructureKitTestSupport
 			environment: [:], // does not contain MISSING_KEY
 			config: config,
 			outputURL: outputURL,
-			diagnostics: diagnostics
+			diagnostics: diagnostics,
 		)
 
 		try CodeGenerator().run(with: context)
@@ -145,7 +145,7 @@ import SwiftStructureKitTestSupport
 			import Foundation
 
 			internal enum BuildSettings {
-			  internal static let missingKey: Bool = true
+				internal static let missingKey: Bool = true
 			}
 
 			"""
@@ -168,7 +168,7 @@ import SwiftStructureKitTestSupport
 			environment: [:],
 			config: config,
 			outputURL: outputURL,
-			diagnostics: diagnostics
+			diagnostics: diagnostics,
 		)
 
 		#expect(throws: GeneratorError.self) {
@@ -196,7 +196,7 @@ import SwiftStructureKitTestSupport
 			environment: ["FOO": "BAR"],
 			config: config,
 			outputURL: outputURL,
-			diagnostics: diagnostics
+			diagnostics: diagnostics,
 		)
 
 		#expect(throws: GeneratorError.self) {
@@ -224,7 +224,7 @@ import SwiftStructureKitTestSupport
 			environment: ["FOO": "BAR"],
 			config: config,
 			outputURL: outputURL,
-			diagnostics: diagnostics
+			diagnostics: diagnostics,
 		)
 
 		try CodeGenerator().run(with: context)
@@ -250,7 +250,7 @@ import SwiftStructureKitTestSupport
 			environment: ["FOO": "BAR"],
 			config: config,
 			outputURL: outputURL,
-			diagnostics: diagnostics
+			diagnostics: diagnostics,
 		)
 
 		#expect(throws: GeneratorError.self) {
@@ -282,7 +282,7 @@ import SwiftStructureKitTestSupport
 			environment: ["FOO": "BAR"],
 			config: config,
 			outputURL: outputURL,
-			diagnostics: diagnostics
+			diagnostics: diagnostics,
 		)
 
 		#expect(throws: GeneratorError.self) {
@@ -309,7 +309,7 @@ import SwiftStructureKitTestSupport
 			environment: ["FOO": "BAR"],
 			config: config,
 			outputURL: outputURL,
-			diagnostics: diagnostics
+			diagnostics: diagnostics,
 		)
 
 		#expect(throws: GeneratorError.self) {
@@ -338,7 +338,7 @@ import SwiftStructureKitTestSupport
 			environment: ["RETRIES": "not_an_int"],
 			config: config,
 			outputURL: outputURL,
-			diagnostics: diagnostics
+			diagnostics: diagnostics,
 		)
 
 		#expect(throws: GeneratorError.self) {
@@ -424,13 +424,13 @@ import SwiftStructureKitTestSupport
 		}
 	}
 
-	@Test func `Array<Int> literal conversions`() throws {
+	@Test func `Array<Int> literal conversions`() {
 		let diagnostics = TestDiagnosticCollector()
 		let context = CodeGenerator.Context(
 			environment: [:],
 			config: Configuration(settings: ConfigurationSettings(_storage: [])),
 			outputURL: URL(filePath: ""),
-			diagnostics: diagnostics
+			diagnostics: diagnostics,
 		)
 		// for simplicity the ints will match the index so I can just test index == output
 		let arrayDesc = CodeGenerator().resolveExpression("0 1 2 3", type: .array(.int), with: context, at: nil)
@@ -450,13 +450,13 @@ import SwiftStructureKitTestSupport
 		#expect(diagnostics.didEmitAnything == false)
 	}
 
-	@Test func `Array<T> literal conversion fails if T conversion fails and T != String`() throws {
+	@Test func `Array<T> literal conversion fails if T conversion fails and T != String`() {
 		let diagnostics = TestDiagnosticCollector()
 		let context = CodeGenerator.Context(
 			environment: [:],
 			config: Configuration(settings: ConfigurationSettings(_storage: [])),
 			outputURL: URL(filePath: ""),
-			diagnostics: diagnostics
+			diagnostics: diagnostics,
 		)
 		// for simplicity the ints will match the index so I can just test index == output
 		let arrayDesc = CodeGenerator().resolveExpression("0 Hello", type: .array(.int), with: context, at: nil)

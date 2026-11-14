@@ -11,4 +11,3 @@ enum TempDir {
 		return tempDir
 	}
 }
-

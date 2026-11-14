@@ -4,9 +4,9 @@
 
 import struct Foundation.URL
 
-package struct Diagnostic: Error, Sendable {
+package struct Diagnostic: Error {
 	/// ordered most → least severe for automatic comparable synthesis
-	package enum Severity: Comparable, Sendable {
+	package enum Severity: Comparable {
 		case fault
 		case error
 		case warning

@@ -10,11 +10,11 @@ let package = Package(
 	products: [
 		.executable(
 			name: "gensettings",
-			targets: ["gensettings"]
+			targets: ["gensettings"],
 		),
 		.plugin(
 			name: "BuildSettingsKitPlugin",
-			targets: ["BuildSettingsKitPlugin"]
+			targets: ["BuildSettingsKitPlugin"],
 		),
 	],
 	dependencies: [
@@ -28,7 +28,7 @@ let package = Package(
 			dependencies: [
 				.product(name: "Yams", package: "Yams"),
 				.product(name: "SwiftStructureKit", package: "SwiftStructureKit"),
-			]
+			],
 		),
 		.executableTarget(
 			name: "gensettings",
@@ -67,7 +67,7 @@ let package = Package(
 				.target(name: "gensettings"),
 			],
 		),
-	]
+	],
 )
 
 for target in package.targets where target.type != .plugin {

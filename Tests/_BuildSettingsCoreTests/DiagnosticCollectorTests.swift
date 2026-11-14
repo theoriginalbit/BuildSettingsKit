@@ -32,11 +32,11 @@ import Testing
 
 	static let describeForModes = [
 		(DiagnosticMode.cli, "buildsettings.yaml"),
-		(.xcode, "/Users/dev/Project/buildsettings.yaml")
+		(.xcode, "/Users/dev/Project/buildsettings.yaml"),
 	]
 	@Test(arguments: Self.describeForModes) func `Diagnostic description formatting in possible modes`(
 		_ mode: DiagnosticMode,
-		_ outputPath: String
+		_ outputPath: String,
 	) {
 		let collector = TestDiagnosticCollector(mode: mode)
 		let file = URL(fileURLWithPath: "/Users/dev/Project/buildsettings.yaml")

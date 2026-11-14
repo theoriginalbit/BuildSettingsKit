@@ -34,7 +34,7 @@ import PackagePlugin
 					outputFiles: [
 						outputFile,
 					],
-				)
+				),
 			]
 		} catch let error as ConfigDiscoveryError {
 			throw mapToPluginError(error, target: targetName)

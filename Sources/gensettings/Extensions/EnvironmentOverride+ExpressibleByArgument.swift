@@ -2,8 +2,8 @@
 // Copyright © 2026 BuildSettingsKit. All rights reserved.
 //
 
-import ArgumentParser
 import _BuildSettingsCore
+import ArgumentParser
 
 extension EnvironmentOverride: ExpressibleByArgument {
 	package init?(argument: String) {
@@ -13,7 +13,7 @@ extension EnvironmentOverride: ExpressibleByArgument {
 		}
 		self.init(
 			key: String(parts[0]),
-			value: String(parts[1])
+			value: String(parts[1]),
 		)
 	}
 }

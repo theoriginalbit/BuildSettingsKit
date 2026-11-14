@@ -22,7 +22,7 @@ import PackagePlugin
 				version,
 				output.path,
 			],
-			outputFiles: [output]
+			outputFiles: [output],
 		)]
 	}
 

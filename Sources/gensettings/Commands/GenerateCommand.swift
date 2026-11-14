@@ -2,9 +2,9 @@
 // Copyright © 2026 BuildSettingsKit. All rights reserved.
 //
 
+import _BuildSettingsCore
 import ArgumentParser
 import Foundation
-import _BuildSettingsCore
 
 struct GenerateCommand: ParsableCommand {
 	static let configuration = CommandConfiguration(
@@ -46,7 +46,7 @@ struct GenerateCommand: ParsableCommand {
 	@Flag(
 		exclusivity: .exclusive,
 		help: ArgumentHelp(
-			"Show diagnostic messages with short filenames (best for CLI) or long file paths for Xcode's issue navigator to annotate (best for parsing.)"
+			"Show diagnostic messages with short filenames (best for CLI) or long file paths for Xcode's issue navigator to annotate (best for parsing.)",
 		),
 	)
 	private var diagnosticMode: DiagnosticMode = .cli
@@ -55,7 +55,7 @@ struct GenerateCommand: ParsableCommand {
 		name: .customLong("build-tool"),
 		inversion: .prefixedNo,
 		exclusivity: .chooseLast,
-		help: .private
+		help: .private,
 	)
 	private var isRunningAsBuildTool: Bool
 

@@ -12,15 +12,15 @@ import Testing
 		("Int", .int),
 		("Double", .double),
 		("URL", .url),
-	]) func parsesPrimitives(rawValue: String, expected: SettingType) {
+	]) func `parses primitives`(rawValue: String, expected: SettingType) {
 		#expect(SettingType(parsing: rawValue) == expected)
 	}
 
-	@Test func parsesArray() {
+	@Test func `parses array`() {
 		#expect(SettingType(parsing: "[Int]") == .array(.int))
 	}
 
-	@Test func parsesNestedArray() {
+	@Test func `parses nested array`() {
 		#expect(SettingType(parsing: "[[String]]") == .array(.array(.string)))
 	}
 
@@ -34,7 +34,7 @@ import Testing
 		"[Float]",
 		"[[Int]",
 		"Int]",
-	]) func rejectsInvalid(raw: String) {
+	]) func `rejects invalid`(raw: String) {
 		#expect(SettingType(parsing: raw) == nil)
 	}
 }

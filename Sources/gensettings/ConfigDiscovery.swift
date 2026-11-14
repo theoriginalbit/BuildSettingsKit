@@ -2,9 +2,9 @@
 // Copyright © 2026 BuildSettingsKit. All rights reserved.
 //
 
-import struct Foundation.URL
-import protocol Foundation.LocalizedError
 import class Foundation.FileManager
+import protocol Foundation.LocalizedError
+import struct Foundation.URL
 
 enum ConfigDiscoveryError: Error, LocalizedError {
 	/// No config files found.
@@ -40,12 +40,12 @@ enum ConfigDiscovery {
 
 	static func locateConfig(in inputFiles: [URL], fallbackSearchDirectory: URL, fileManager: FileManager = .default) throws(ConfigDiscoveryError) -> URL {
 		do {
-			return try Self.locateConfig(in: inputFiles)
+			return try locateConfig(in: inputFiles)
 		} catch ConfigDiscoveryError.notFound {
 			// then try to find a config in the fallback dir
 			let files = try? fileManager.contentsOfDirectory(
 				at: fallbackSearchDirectory,
-				includingPropertiesForKeys: [.isDirectoryKey]
+				includingPropertiesForKeys: [.isDirectoryKey],
 			)
 			if let files {
 				return try Self.locateConfig(in: files)
@@ -57,7 +57,7 @@ enum ConfigDiscovery {
 	/// Find the config file.
 	static func locateConfig(in inputFiles: [URL]) throws(ConfigDiscoveryError) -> URL {
 		let matchedConfigs = inputFiles.filter(isSupportedConfigFileName(_:))
-		guard matchedConfigs.count > 0 else {
+		guard !matchedConfigs.isEmpty else {
 			throw .notFound
 		}
 		guard matchedConfigs.count == 1 else {

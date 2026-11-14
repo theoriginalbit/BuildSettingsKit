@@ -21,8 +21,8 @@ import Testing
 	}
 
 	@Test func `generation failed error output`() {
-        let error = GeneratorError.generationFailed
-        #expect(error.alreadyLogged)
-        #expect(error.description == "Code generation failed due to previous errors.")
-    }
+		let error = GeneratorError.generationFailed
+		#expect(error.alreadyLogged)
+		#expect(error.description == "Code generation failed due to previous errors.")
+	}
 }

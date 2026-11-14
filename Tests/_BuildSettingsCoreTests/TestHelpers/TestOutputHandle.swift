@@ -7,15 +7,15 @@ import Testing
 @testable import _BuildSettingsCore
 
 final class TestOutputHandle: DiagnosticOutputHandle, @unchecked Sendable {
-    private var _output = ""
+	private var _output = ""
 
-    var output: String {
-        return _output
-    }
+	var output: String {
+		_output
+	}
 
-    func write(_ data: Data) {
-        if let string = String(data: data, encoding: .utf8) {
-            _output += string
-        }
-    }
+	func write(_ data: Data) {
+		if let string = String(data: data, encoding: .utf8) {
+			_output += string
+		}
+	}
 }

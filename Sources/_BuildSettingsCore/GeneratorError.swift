@@ -43,9 +43,9 @@ extension DecodingError {
 		switch self {
 		case let .keyNotFound(key, context):
 			context.codingPath + CollectionOfOne(key)
-		case let .valueNotFound(_, context),
-			let .typeMismatch(_, context),
-			let .dataCorrupted(context):
+		case let .dataCorrupted(context),
+		     let .typeMismatch(_, context),
+		     let .valueNotFound(_, context):
 			context.codingPath
 		@unknown default:
 			[]

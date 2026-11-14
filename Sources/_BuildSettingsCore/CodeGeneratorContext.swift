@@ -12,10 +12,10 @@ package extension CodeGenerator {
 		let diagnostics: Diagnostics
 
 		package init(
-			environment: [String : String],
+			environment: [String: String],
 			config: Configuration,
 			outputURL: URL,
-			diagnostics: Diagnostics
+			diagnostics: Diagnostics,
 		) {
 			self.environment = environment
 			self.config = config

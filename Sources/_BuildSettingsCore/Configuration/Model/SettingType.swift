@@ -25,7 +25,7 @@ indirect enum SettingType: Sendable, Decodable {
 			guard let element = Self(parsing: inner) else { return nil }
 			self = .optional(element)
 		} else if rawValue.hasPrefix("["), rawValue.hasSuffix("]") {
-            let inner = String(rawValue.dropFirst().dropLast())
+			let inner = String(rawValue.dropFirst().dropLast())
 			guard let element = Self(parsing: inner) else { return nil }
 			self = .array(element)
 		} else {

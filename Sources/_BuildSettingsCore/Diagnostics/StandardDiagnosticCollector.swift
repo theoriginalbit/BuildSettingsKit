@@ -2,13 +2,13 @@
 // Copyright © 2026 BuildSettingsKit. All rights reserved.
 //
 
-import class Foundation.FileHandle
 import struct Foundation.Data
 import func Foundation.exit
 import let Foundation.EXIT_FAILURE
+import class Foundation.FileHandle
 import struct Synchronization.Atomic
 
-package struct StandardDiagnosticCollector<StdOut: DiagnosticOutputHandle, StdErr: DiagnosticOutputHandle>: DiagnosticCollector, Sendable {
+package struct StandardDiagnosticCollector<StdOut: DiagnosticOutputHandle, StdErr: DiagnosticOutputHandle>: DiagnosticCollector {
 	final class MutableState: Sendable {
 		let hasErrors = Atomic<Bool>(false)
 	}

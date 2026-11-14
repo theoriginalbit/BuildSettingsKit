@@ -14,7 +14,7 @@ import Testing
 			stdOut: stdOut,
 			stdErr: stdErr,
 			mode: .cli,
-			verbosity: 2 // allow info, notice, warning, error
+			verbosity: 2, // allow info, notice, warning, error
 		)
 
 		#expect(!collector.hasErrors)
@@ -44,7 +44,7 @@ import Testing
 			stdOut: stdOut,
 			stdErr: stdErr,
 			mode: .cli,
-			verbosity: 0 // warnings, errors, faults only
+			verbosity: 0, // warnings, errors, faults only
 		)
 
 		collector.info("Info text")

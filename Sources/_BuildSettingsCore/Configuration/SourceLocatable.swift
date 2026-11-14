@@ -2,8 +2,8 @@
 // Copyright © 2026 BuildSettingsKit. All rights reserved.
 //
 
-import enum Yams.Node
 import struct Foundation.URL
+import enum Yams.Node
 
 @propertyWrapper
 package struct SourceLocatable<Value>: CustomStringConvertible {
