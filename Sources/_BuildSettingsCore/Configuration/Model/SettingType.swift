@@ -12,7 +12,7 @@ indirect enum SettingType: Sendable, Decodable {
 	case optional(SettingType)
 
 	init?(parsing rawValue: String) {
-		if let primitive = Primitive(rawValue: rawValue) {
+		if let primitive = Primitive(rawValue: rawValue.lowercased()) {
 			self = switch primitive {
 			case .string: .string
 			case .bool: .bool
@@ -34,10 +34,10 @@ indirect enum SettingType: Sendable, Decodable {
 	}
 
 	private enum Primitive: String {
-		case string = "String"
-		case bool = "Bool"
-		case int = "Int"
-		case double = "Double"
-		case url = "URL"
+		case string = "string"
+		case bool = "bool"
+		case int = "int"
+		case double = "double"
+		case url = "url"
 	}
 }

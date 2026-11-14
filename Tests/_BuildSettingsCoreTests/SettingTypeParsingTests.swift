@@ -8,10 +8,15 @@ import Testing
 @Suite struct SettingTypeParsingTests {
 	@Test(arguments: [
 		("String", SettingType.string),
+		("string", .string),
 		("Bool", .bool),
+		("bool", .bool),
 		("Int", .int),
+		("int", .int),
 		("Double", .double),
+		("double", .double),
 		("URL", .url),
+		("url", .url),
 	]) func `parses primitives`(rawValue: String, expected: SettingType) {
 		#expect(SettingType(parsing: rawValue) == expected)
 	}
@@ -26,12 +31,11 @@ import Testing
 
 	@Test(arguments: [
 		"",
-		"string",
-		"Float",
+		"CustomType",
 		"[",
 		"]",
 		"[]",
-		"[Float]",
+		"[CustomType]",
 		"[[Int]",
 		"Int]",
 	]) func `rejects invalid`(raw: String) {
