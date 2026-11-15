@@ -145,11 +145,15 @@ package struct CodeGenerator {
 			}
 			return (type, expression)
 		}
-		if case let .optional(wrappedType) = type {
+		if case .optional = type {
+			context.diagnostics.note(
+				"No matching key in environment: '\(setting.key)', type marked as optional so using nil literal",
+				location: setting.$key,
+			)
 			return (type, .literal(nil))
 		}
 		context.diagnostics.error(
-			"No matching key in environment: '\(setting.key)' and no default value supplied",
+			"No matching key in environment: '\(setting.key)', supply default value or mark as optional",
 			location: setting.$key,
 		)
 		return nil
