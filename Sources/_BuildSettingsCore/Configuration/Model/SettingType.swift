@@ -7,6 +7,7 @@ indirect enum SettingType: Sendable, Decodable {
 	case bool
 	case int
 	case double
+	case float
 	case url
 	case array(SettingType)
 	case optional(SettingType)
@@ -18,6 +19,7 @@ indirect enum SettingType: Sendable, Decodable {
 			case .bool: .bool
 			case .int: .int
 			case .double: .double
+			case .float: .float
 			case .url: .url
 			}
 		} else if rawValue.hasSuffix("?") { // parse ? first because it's imbalanced
@@ -38,6 +40,7 @@ indirect enum SettingType: Sendable, Decodable {
 		case bool = "bool"
 		case int = "int"
 		case double = "double"
+		case float = "float"
 		case url = "url"
 	}
 }

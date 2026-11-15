@@ -228,6 +228,7 @@ package struct CodeGenerator {
 		case .bool: .bool
 		case .int: .int
 		case .double: .double
+		case .float: .identifier("Float")
 		case .url: .identifier("URL")
 		case let .array(elementType): .array(typeReference(for: elementType))
 		case let .optional(wrappedType): .optional(typeReference(for: wrappedType))
@@ -246,6 +247,7 @@ package struct CodeGenerator {
 			case .bool: try boolLiteral(value)
 			case .int: try intLiteral(value)
 			case .double: try doubleLiteral(value)
+			case .float: try doubleLiteral(value) // when rendered as a literal, they're the same
 			case .url: try urlLiteral(value)
 			case let .array(elementType): try arrayLiteral(value, elementType: elementType, with: context, at: location)
 			case let .optional(wrappedType): try optionalLiteral(value, elementType: wrappedType, with: context, at: location)
