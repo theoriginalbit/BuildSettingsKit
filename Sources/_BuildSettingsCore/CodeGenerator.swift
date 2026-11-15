@@ -140,6 +140,12 @@ package struct CodeGenerator {
 				// no need to output diagnostic, resolveExpression does it
 				return nil
 			}
+			if case .optional = type {
+				context.diagnostics.warning(
+					"Default supplied for '\(setting.key)' while also marked as optional. Consider removing optional for simpler usage.",
+					location: setting.$default,
+				)
+			}
 			return (type, expression)
 		}
 		if case .optional = type {

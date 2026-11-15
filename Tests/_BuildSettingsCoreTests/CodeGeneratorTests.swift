@@ -176,7 +176,7 @@ import Testing
 		}
 
 		#expect(diagnostics.hasErrors)
-		#expect(diagnostics.errors.contains { $0.message.contains("Must supply at least one setting to codegen") })
+		#expect(diagnostics.errors.contains { $0.message == "Must supply at least one setting to be able to generate code" })
 	}
 
 	@Test func `Invalid type name emits error and throws`() throws {
