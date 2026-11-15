@@ -25,7 +25,7 @@ import PackagePlugin
 
 			return [
 				.buildCommand(
-					displayName: "Running gensettings",
+					displayName: "gensettings",
 					executable: tool.url,
 					arguments: arguments,
 					inputFiles: [

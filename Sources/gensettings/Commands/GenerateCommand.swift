@@ -20,7 +20,7 @@ struct GenerateCommand: ParsableCommand {
 		),
 		completion: .file(extensions: ["yaml", "yml"]),
 	)
-	private var config: URL?
+	private var config: URL? = nil
 
 	@Option(
 		name: [.short, .customLong("output"), .long],
@@ -30,7 +30,7 @@ struct GenerateCommand: ParsableCommand {
 		),
 		completion: .file(extensions: ["swift"]),
 	)
-	private var outputFile: URL?
+	private var outputFile: URL? = nil
 
 	@Option(
 		name: .shortAndLong,
@@ -57,7 +57,7 @@ struct GenerateCommand: ParsableCommand {
 		exclusivity: .chooseLast,
 		help: .private,
 	)
-	private var isRunningAsBuildTool: Bool
+	private var isRunningAsBuildTool: Bool = false
 
 	@Flag(name: .shortAndLong, help: "Increase verbosity (-vvv).")
 	private var verbose: Int
@@ -117,7 +117,7 @@ struct GenerateCommand: ParsableCommand {
 				} else {
 					"Output file path argument was supplied, outputFileName will be ignored."
 				}
-				diagnostics.note(
+				diagnostics.warning(
 					message,
 					location: config.$outputFileName,
 				)

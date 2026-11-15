@@ -12,10 +12,8 @@ package struct CodeGenerator {
 		let outputURL = context.outputURL
 		let config = context.config
 
-		context.diagnostics.info("Output file: \(outputURL.path())")
-
 		if config.settings.isEmpty {
-			context.diagnostics.error("Must supply at least one setting to codegen", location: config.$settings)
+			context.diagnostics.error("Must supply at least one setting to be able to generate code", location: config.$settings)
 		}
 
 		guard let configAccessModifier = resolveAccessModifier(
@@ -36,9 +34,6 @@ package struct CodeGenerator {
 				properties.append(property)
 			}
 		}
-
-		// we may not have all the settings defined, but do partial code generation
-		// anyway, then throw afterward.
 
 		let file = SwiftFile(
 			headerComment: """
@@ -67,10 +62,12 @@ package struct CodeGenerator {
 
 		if let existingData = try? Data(contentsOf: outputURL), existingData == newData {
 			// Content is identical, no write needed otherwise we would update the modified time
+			context.diagnostics.info("No changes needed to \(outputURL.path())")
 			return
 		}
 
 		try newData.write(to: outputURL, options: .atomic)
+		context.diagnostics.info("Written to \(outputURL.path())")
 
 		// Abort if any diagnostic errors were prevented complete generation
 		guard !context.diagnostics.hasErrors else {
@@ -153,7 +150,7 @@ package struct CodeGenerator {
 			return (type, .literal(nil))
 		}
 		context.diagnostics.error(
-			"No matching key in environment: '\(setting.key)', supply default value or mark as optional",
+			"No matching key in environment: '\(setting.key)', supply default value or set type as optional ('\(setting.type)?')",
 			location: setting.$key,
 		)
 		return nil
@@ -166,7 +163,7 @@ package struct CodeGenerator {
 		guard let swiftName = setting.swiftName else {
 			guard let identifier = Identifier.camelCased(setting.key) else {
 				context.diagnostics.error(
-					"Unable to turn '\(setting.key)' into valid identifier. Please specify with swiftName.",
+					"Unable to turn '\(setting.key)' into valid identifier. Please specify a valid identifier with 'swiftName'.",
 					location: setting.$key,
 				)
 				return nil
@@ -201,7 +198,7 @@ package struct CodeGenerator {
 		if let accessModifier = AccessModifier(rawValue: value) {
 			return accessModifier
 		}
-		diagnostics.error("Invalid access modifier: '\(value)' falling back to '\(defaultValue.rawValue)'", location: location)
+		diagnostics.error("Invalid access modifier: '\(value)' must be one of \(AccessModifier.allCasesAsErrorOutput)", location: location)
 		return nil
 	}
 

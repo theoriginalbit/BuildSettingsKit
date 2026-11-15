@@ -1,6 +1,23 @@
-outputFileName: BuildSettings.swift
+typeName: BuildConfig
 
 settings:
   - key: MARKETING_VERSION
     type: String
     comment: User-facing version string shown in the App Store and Settings.
+
+  - key: CURRENT_PROJECT_VERSION
+    swiftName: buildNumber
+    type: Int
+    comment: Monotonically increasing build number used for App Store submissions.
+
+  - key: PRODUCT_BUNDLE_IDENTIFIER
+    type: String
+    comment: The bundle identifier of the main application target.
+
+  # Avoid Info.plist by reading direct from build settings
+  - key: API_BASE_URL
+    type: URL
+    comment: Base URL for all API calls.
+
+  - key: SUPPORTED_PLATFORMS
+    type: '[String]'
