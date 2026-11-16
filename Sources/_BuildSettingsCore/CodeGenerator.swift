@@ -136,7 +136,7 @@ package struct CodeGenerator {
 		// There was no value in the environment, check if the config defined a default
 		// and validate that it can represent the type that was defined.
 		if let value = setting.default {
-			guard let expression = resolveExpression(value, type: type, with: context, at: setting.$key) else {
+			guard let expression = resolveExpression(value, type: type, with: context, at: setting.$default) else {
 				// no need to output diagnostic, resolveExpression does it
 				return nil
 			}
