@@ -31,11 +31,11 @@ enum ConfigDiscoveryError: Error, LocalizedError {
 }
 
 enum ConfigDiscovery {
-	static let supportedConfigFiles: Set<String> = [
-		"buildsettings.yaml",
-		"buildsettings.yml",
+	static let supportedConfigFiles: [String] = [
 		".buildsettings.yaml",
 		".buildsettings.yml",
+		"buildsettings.yaml",
+		"buildsettings.yml",
 	]
 
 	static func locateConfig(in inputFiles: [URL], fallbackSearchDirectory: URL, fileManager: FileManager = .default) throws(ConfigDiscoveryError) -> URL {

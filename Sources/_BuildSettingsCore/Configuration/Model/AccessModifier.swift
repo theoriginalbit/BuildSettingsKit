@@ -11,7 +11,7 @@ package enum AccessModifier: String, CaseIterable {
 	case `fileprivate`
 	case `private`
 
-	static let allCasesAsErrorOutput = AccessModifier.allCases
+	package static let allCasesAsList = AccessModifier.allCases
 		.map(\.rawValue)
 		.formatted(.list(type: .or))
 }

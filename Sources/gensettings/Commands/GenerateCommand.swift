@@ -26,7 +26,7 @@ struct GenerateCommand: ParsableCommand {
 		name: [.short, .customLong("output"), .long],
 		help: ArgumentHelp(
 			"Path for the generated Swift file.",
-			discussion: "If not provided it will be generated in the current working directory as \(Constants.outputFileName).",
+			discussion: "If not provided it will be generated in the current working directory as \(Defaults.outputFileName).",
 		),
 		completion: .file(extensions: ["swift"]),
 	)
@@ -131,7 +131,7 @@ struct GenerateCommand: ParsableCommand {
 			)
 			throw .specifyOutputPath
 		}
-		let outputFileName = config.outputFileName ?? Constants.outputFileName
+		let outputFileName = config.outputFileName ?? Defaults.outputFileName
 		return URL(fileURLWithPath: FileManager.default.currentDirectoryPath)
 			.appending(path: outputFileName, directoryHint: .notDirectory)
 	}

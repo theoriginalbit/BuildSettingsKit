@@ -16,7 +16,7 @@ import PackagePlugin
 		do {
 			let tool = try tool("gensettings")
 			let configURL = try ConfigDiscovery.locateConfig(in: sourceFiles.map(\.url), fallbackSearchDirectory: rootDirectory)
-			let outputFile = pluginWorkDirectory.appending(component: Constants.outputFileName)
+			let outputFile = pluginWorkDirectory.appending(component: Defaults.outputFileName)
 			let arguments = [
 				"generate", "--build-tool", "--xcode",
 				"--config", configURL.path(percentEncoded: false),

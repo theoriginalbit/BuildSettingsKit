@@ -204,7 +204,7 @@ package struct CodeGenerator {
 		if let accessModifier = AccessModifier(rawValue: value) {
 			return accessModifier
 		}
-		diagnostics.error("Invalid access modifier: '\(value)' must be one of \(AccessModifier.allCasesAsErrorOutput)", location: location)
+		diagnostics.error("Invalid access modifier: '\(value)' must be one of \(AccessModifier.allCasesAsList)", location: location)
 		return nil
 	}
 
