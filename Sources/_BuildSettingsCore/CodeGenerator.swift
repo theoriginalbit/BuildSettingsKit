@@ -126,6 +126,12 @@ package struct CodeGenerator {
 		guard let type = resolveType(for: setting, diagnostics: context.diagnostics) else {
 			return nil
 		}
+		if case .optional = type, setting.default != nil {
+			context.diagnostics.warning(
+				"Default supplied for '\(setting.key)' while also marked as optional. Consider removing optional for simpler usage.",
+				location: setting.$default,
+			)
+		}
 		if let value = context.environment[setting.key] {
 			guard let expression = resolveExpression(value, type: type, with: context, at: setting.$key) else {
 				// no need to output diagnostic, resolveExpression does it
@@ -139,12 +145,6 @@ package struct CodeGenerator {
 			guard let expression = resolveExpression(value, type: type, with: context, at: setting.$default) else {
 				// no need to output diagnostic, resolveExpression does it
 				return nil
-			}
-			if case .optional = type {
-				context.diagnostics.warning(
-					"Default supplied for '\(setting.key)' while also marked as optional. Consider removing optional for simpler usage.",
-					location: setting.$default,
-				)
 			}
 			return (type, expression)
 		}
