@@ -6,6 +6,9 @@ let package = Package(
 	name: "BuildSettingsKit",
 	platforms: [
 		.macOS(.v15),
+
+		// Declared so it can be a plugin on a project of the following
+		.iOS(.v18), .watchOS(.v11), .tvOS(.v18), .visionOS(.v2),
 	],
 	products: [
 		.executable(
