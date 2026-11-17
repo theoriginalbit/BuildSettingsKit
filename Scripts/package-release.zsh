@@ -24,10 +24,13 @@ fi
 
 # --- Standalone zip -------------------------------------------------------
 STANDALONE_ZIP=gensettings-macos-arm64.zip
+STANDALONE_STAGING_DIR=$(mktemp -d)
+trap 'rm -rf "$STANDALONE_STAGING_DIR"' EXIT
 
-# Make sure the binary is executable, then zip it (no parent dirs) with the license
+# Zip the executable with the license
+cp "$MAC_BINARY" LICENSE "$STANDALONE_STAGING_DIR/"
 rm -f "$STANDALONE_ZIP"
-ditto -c -k "$MAC_BINARY" LICENSE "$STANDALONE_ZIP"
+ditto -c -k --norsrc "$STANDALONE_STAGING_DIR" "$STANDALONE_ZIP"
 
 # --- Artifact bundle ------------------------------------------------------
 ARTIFACT_BUNDLE=gensettings.artifactbundle
@@ -48,5 +51,5 @@ cp "$MAC_BINARY" "$MAC_EXECUTABLE"
 cp LICENSE "$ARTIFACT_BUNDLE/"
 
 # Zip the bundle and compute the checksum SwiftPM's binaryTarget needs
-ditto -c -k --keepParent "$ARTIFACT_BUNDLE" "$ARTIFACT_BUNDLE.zip"
+ditto -c -k --norsrc --keepParent "$ARTIFACT_BUNDLE" "$ARTIFACT_BUNDLE.zip"
 swift package compute-checksum "$ARTIFACT_BUNDLE.zip" | tee "$ARTIFACT_BUNDLE.zip.sha256"
