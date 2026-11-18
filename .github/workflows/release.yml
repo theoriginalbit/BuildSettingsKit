@@ -8,6 +8,9 @@ jobs:
   macos:
     name: Build macOS binary and upload to release artifacts
     runs-on: macos-latest
+    permissions:
+      contents: write
+
     steps:
       - name: Checkout
         uses: actions/checkout@v7
