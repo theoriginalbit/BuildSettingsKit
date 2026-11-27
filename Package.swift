@@ -39,9 +39,6 @@ let package = Package(
 				.target(name: "_BuildSettingsCore"),
 				.product(name: "ArgumentParser", package: "swift-argument-parser"),
 			],
-			plugins: [
-				.plugin(name: "GitVersionPlugin"),
-			],
 		),
 		.testTarget(
 			name: "_BuildSettingsCoreTests",
@@ -58,10 +55,6 @@ let package = Package(
 			dependencies: [
 				.target(name: "gensettings"),
 			],
-		),
-		.plugin(
-			name: "GitVersionPlugin",
-			capability: .buildTool(),
 		),
 		.plugin(
 			name: "BuildSettingsKitPlugin",

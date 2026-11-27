@@ -62,7 +62,7 @@ struct BuildSettingsKit: ParsableCommand {
 			      type: '[Int]'
 
 			""",
-		version: GitVersion.current,
+		version: toolVersion,
 		subcommands: [GenerateCommand.self, InitCommand.self],
 		defaultSubcommand: GenerateCommand.self,
 	)

@@ -15,6 +15,12 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v7
 
+      - name: Update version
+        run: echo "let toolVersion = \"$VERSION\"" > Sources/gensettings/ToolVersion.swift
+        shell: bash
+        env:
+          VERSION: ${{ inputs.version }}
+
       - name: Build macOS binary
         run: swift build -c release -Xswiftc -Osize
 
