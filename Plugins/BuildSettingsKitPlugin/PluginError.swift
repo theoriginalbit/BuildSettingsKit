@@ -4,17 +4,17 @@
 
 import Foundation
 
-enum PluginError: Error, LocalizedError {
+enum PluginError: Error, CustomStringConvertible {
 	case incompatibleTarget(name: String)
 	case configNotFound(targetName: String)
 	case multipleConfigsFound(files: [URL], targetName: String)
 
-	var errorDescription: String? {
+	var description: String {
 		switch self {
 		case let .incompatibleTarget(name):
 			return "Incompatible target called '\(name)'. Only Swift source targets can be used with the BuildSettingsKit plugin."
 		case let .configNotFound(targetName):
-			return "No config file found in target '\(targetName)' or the root directory."
+			return "No config file found named '\(ConfigDiscovery.supportedConfigFiles[0])' in target '\(targetName)' or the root directory."
 		case let .multipleConfigsFound(candidates, targetName):
 			let list = candidates
 				.map { "  - \($0)" }
